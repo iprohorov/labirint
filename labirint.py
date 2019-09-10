@@ -109,34 +109,34 @@ class Labyrinth ():
          
 
     def generate (self):
-        x,y =  self.route[len(self.route)-1]
-        self.labyrinth[x][y].visit = True
-        new_position = self.selectNextPosition (x,y) # res,x,y,dir
-        #print(self.route)
-        if new_position[0]:
-            #input()
-            if not self.generateIsCompleat():
-                if (self.labyrinth[new_position[1]][new_position[2]].visit == False) and (self.checkRoomVisit(x,y) == False):
-                    #print ("next step")
-                    self.dellWall(new_position)
-                    self.route.append((new_position[1],new_position[2]))
-                    self.debug()
+        while (True):
+            x,y =  self.route[len(self.route)-1]
+            self.labyrinth[x][y].visit = True
+            new_position = self.selectNextPosition (x,y) # res,x,y,dir
+            #print(self.route)
+            if new_position[0]:
+                #input()
+                if not self.generateIsCompleat():
+                    if (self.labyrinth[new_position[1]][new_position[2]].visit == False) and (self.checkRoomVisit(x,y) == False):
+                        #print ("next step")
+                        self.dellWall(new_position)
+                        self.route.append((new_position[1],new_position[2]))
+                        self.debug()
+                        #self.draw()
+                        continue #self.generate()
+                    elif self.checkRoomVisit(x,y):
+                        #print ("next priv")
+                        self.route.pop()
+                        continue #self.generate()
+                    elif self.labyrinth[new_position[1]][new_position[2]].visit :
+                        continue #self.generate()
+                else:
+                    print ("visiting end")
                     #self.draw()
-                    self.generate()
-                elif self.checkRoomVisit(x,y):
-                    #print ("next priv")
-                    self.route.pop()
-                    self.generate()
-                elif self.labyrinth[new_position[1]][new_position[2]].visit :
-                    self.generate()
-                    self.debug()
+                    return True
             else:
-                print ("visiting end")
-                #self.draw()
-                return True
-        else:
-            #print ("visiting")
-            return self.generate()
+                #print ("visiting")
+                return self.generate()
     def selectNextPosition (self, x, y):
         direction = randint(0,3)
         #print ("dir {} ".format(direction))
@@ -188,8 +188,8 @@ class Labyrinth ():
                 sys.stdout.write(line+"\r\n")
 
     def draw (self,screen):
-        scaleX = 3
-        scaleY = 3
+        scaleX = 10
+        scaleY = 10
         wallMap = [[ 0 for x in range(self.sizeX*scaleY)] for y in range(self.sizeY*scaleX)]
         #print (wallMap) # 3 cells 
 
@@ -217,7 +217,7 @@ class Labyrinth ():
         for x in range (self.sizeX*scaleX):
             for y in range (self.sizeY*scaleY):
                 if (wallMap[y][x]):
-                    pygame.draw.rect(screen, (255, 255, 255), (x*5, y*5, 5, 5))
+                    pygame.draw.rect(screen, (255, 255, 255), (x*10, y*10, 10, 10))
 
         pygame.display.update()
 
@@ -227,11 +227,11 @@ class Labyrinth ():
 
 pygame.init()
 
-size = width, height = 640, 480
+size = width, height = 1366, 768
 speed = [2, 2]
 black = 0, 0, 0
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-map = Labyrinth(screen,30,30)
+map = Labyrinth(screen,100,100)
 map.dbgPrint()
 map.draw(screen)
 
