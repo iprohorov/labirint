@@ -55,7 +55,7 @@ class Room:
         return "Room {} {}, Visit{} Wall {} {} {} {}".format(self.x,self.y,self.visit, self.wall[0],self.wall[1],self.wall[2],self.wall[3])
 
 class Labyrinth ():
-    def __init__ (self, sizeX = 10, sizeY = 10):
+    def __init__ (self,screen, sizeX,sizeY):
         self.labyrinth = [[Room (X=x,Y=y) for x in range (sizeY)] for y in range (sizeX)]
         self.route = [(0,0)]
         self.sizeX = sizeX
@@ -81,9 +81,7 @@ class Labyrinth ():
 
         if (y-1 < 0 or self.labyrinth[x][y-1].visit):
             count += 1
-        print(x,y)
-        print(len (self.labyrinth[x]))
-        print(self.sizeY)
+
         if (y+1 > (self.sizeY-1)) or self.labyrinth[x][y+1].visit:
             count += 1
         #print (count)
@@ -221,9 +219,10 @@ class Labyrinth ():
                 if (wallMap[y][x]):
                     pygame.draw.rect(screen, (255, 255, 255), (x*5, y*5, 5, 5))
 
+        pygame.display.update()
 
-map = Labyrinth(30,30)
-map.dbgPrint()
+
+
 #map.generate()
 
 pygame.init()
@@ -231,12 +230,16 @@ pygame.init()
 size = width, height = 640, 480
 speed = [2, 2]
 black = 0, 0, 0
-
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
+map = Labyrinth(screen,30,30)
+map.dbgPrint()
 map.draw(screen)
 
 
-pygame.display.update()
+
+
+
+
 while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
