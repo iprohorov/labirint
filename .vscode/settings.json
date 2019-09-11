@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "C:\\SPB_Data\\.platformio\\python27\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
+}

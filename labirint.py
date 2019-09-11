@@ -5,11 +5,14 @@ import pygame
 from random import randint
 sys.setrecursionlimit(10000)
 
-class Wall: 
+class Wall (pygame.sprite.Sprite): 
     def __init__ (self, X=0, Y=0):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("wall.png").convert_alpha()
         self.rect = self.image.get_rect(center=(X,Y))
+    def clear_callback(surf, rect):
+        color = 0, 0, 0
+        surf.fill(color, rect)
 
 
 # labyrinth = [[Wall (X=x,Y=y) for x in range (10)] for y in range (10)]
@@ -226,46 +229,59 @@ class Labyrinth ():
 pygame.init()
 
 size = width, height = 1366, 768
+# size = width, height = 640, 480
 titleSize = 16
 speed = [2, 2]
-black = 0, 0, 0
+backcolor = 41, 75, 60
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-map = Labyrinth(screen,100,100) #50 50
+map = Labyrinth(screen,200,200) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
-steep = 0
+steepX = 0
+steepY = 0
+Walls= pygame.sprite.Group() 
+
 
 
 def DrawMAP ():
-    if (steep+int(width/16)+1) > xSize:
+    if (steepX+int(width/16)+1) > xSize:
         #print ("StopX")
         return False
 
-    if (steep+int(height/16)+1) > ySize:
+    if (steepY+int(height/16)+1) > ySize:
         #print ("StopY")
         return False
+
+    
+    # Walls.clear(screen)
+    Walls.empty()
 
     # for row in wallMap:
     #     print (row)
 
-    for x in range (steep,steep+int(width/16)+1):
-        for y in range (steep,steep+int(height/16)+1):
+    
+    for x in range (steepX,steepX+int(width/16)+1):
+        for y in range (steepY,steepY+int(height/16)+1):
             if (wallMap[y][x]):
                 #print (x,y)
-                pygame.draw.rect(screen, (255, 255, 255), (((x-steep)*16, (y-steep)*16, 16, 16)))
-    pygame.display.update()
+                Walls.add(Wall((x-steepX)*16,(y-steepY)*16))
 
     return True
 
 while 1:
     
-    screen.fill((0,0,0))
-    pygame.time.delay(100)
+    screen.fill(backcolor)
     DrawMAP()
-    steep += 1
-    
+    Walls.draw(screen)
+    pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                steepX -= 1
+            if event.key == pygame.K_RIGHT:
+                steepX += 1
 
 
 
