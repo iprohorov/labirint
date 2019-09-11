@@ -1,19 +1,15 @@
 
 
-import sys, pygame
+import sys
+import pygame
 from random import randint
 sys.setrecursionlimit(10000)
 
-# class Wall: 
-#     def __init__ (self, X=0, Y=0):
-#         self.exist = True
-#         self.positionX = X
-#         self.positionY = Y
-#         self.N = self.positionX + self.positionY
-#     def draw (self):
-#         print ("|")
-#     def __str__ (self):
-#         return "Wall {} x={} y={} ".format(self.exist,self.positionX,self.positionY)
+class Wall: 
+    def __init__ (self, X=0, Y=0):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("wall.png").convert_alpha()
+        self.rect = self.image.get_rect(center=(X,Y))
 
 
 # labyrinth = [[Wall (X=x,Y=y) for x in range (10)] for y in range (10)]
@@ -187,9 +183,9 @@ class Labyrinth ():
             for line in lines:
                 sys.stdout.write(line+"\r\n")
 
-    def draw (self,screen):
-        scaleX = 10
-        scaleY = 10
+    def draw (self):
+        scaleX = 8
+        scaleY = 8
         wallMap = [[ 0 for x in range(self.sizeX*scaleY)] for y in range(self.sizeY*scaleX)]
         #print (wallMap) # 3 cells 
 
@@ -211,15 +207,17 @@ class Labyrinth ():
                 if self.labyrinth[y][x].wall[2]:
                     for i in range (scaleY):
                         wallMap[x*scaleY+i][y*scaleX+scaleX-1] = 1
+        
+        return (wallMap.copy(), self.sizeX*scaleX, self.sizeY*scaleY) # first y second Y
 
-        for row in wallMap:
-            print (row)
-        for x in range (self.sizeX*scaleX):
-            for y in range (self.sizeY*scaleY):
-                if (wallMap[y][x]):
-                    pygame.draw.rect(screen, (255, 255, 255), (x*10, y*10, 10, 10))
+        # for row in wallMap:
+        #     print (row)
+        # for x in range (self.sizeX*scaleX):
+        #     for y in range (self.sizeY*scaleY):
+        #         if (wallMap[y][x]):
+        #             pygame.draw.rect(screen, (255, 255, 255), (x*10, y*10, 10, 10))
 
-        pygame.display.update()
+        # pygame.display.update()
 
 
 
@@ -228,19 +226,44 @@ class Labyrinth ():
 pygame.init()
 
 size = width, height = 1366, 768
+titleSize = 16
 speed = [2, 2]
 black = 0, 0, 0
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-map = Labyrinth(screen,100,100)
+map = Labyrinth(screen,100,100) #50 50
 map.dbgPrint()
-map.draw(screen)
+wallMap, xSize, ySize = map.draw()
+steep = 0
 
 
+def DrawMAP ():
+    if (steep+int(width/16)+1) > xSize:
+        #print ("StopX")
+        return False
 
+    if (steep+int(height/16)+1) > ySize:
+        #print ("StopY")
+        return False
 
+    # for row in wallMap:
+    #     print (row)
 
+    for x in range (steep,steep+int(width/16)+1):
+        for y in range (steep,steep+int(height/16)+1):
+            if (wallMap[y][x]):
+                #print (x,y)
+                pygame.draw.rect(screen, (255, 255, 255), (((x-steep)*16, (y-steep)*16, 16, 16)))
+    pygame.display.update()
+
+    return True
 
 while 1:
+    
+    screen.fill((0,0,0))
+    pygame.time.delay(100)
+    DrawMAP()
+    steep += 1
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
