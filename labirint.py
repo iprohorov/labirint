@@ -270,6 +270,7 @@ def DrawMAP ():
 
     return True
 
+FLAG = True
 while 1:
     #event 
     for event in pygame.event.get():
@@ -278,22 +279,42 @@ while 1:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 player.MoveLeft()
-                #cameraPositionX -= 1
+                #cameraPositionX += 1
             if event.key == pygame.K_RIGHT:
                 player.MoveRight()
-                #cameraPositionX += 1
+                #cameraPositionX -= 1
             if event.key == pygame.K_DOWN:
                 player.MoveDown()
-                #cameraPositionY += 1
+                #cameraPositionY -= 1
             if event.key == pygame.K_UP:
                 player.MoveUp()
-                #cameraPositionY -= 1
+                #cameraPositionY += 1
     #drawing
     screen.fill(backcolor)
     DrawMAP()
     Walls.draw(screen)
     screen.blit(player.image, player.rect)
     pygame.display.update()
+
+    #camera update
+    # camera left palaer rig
+    
+    if ((player.rect.x > 16*4) ):
+        cameraPositionX += 4
+        player.rect.x -= 4*16
+
+    if ((player.rect.x < 16) ):
+        cameraPositionX -= 4
+        player.rect.x += 4*16 
+
+    if ((player.rect.y > 16*4) ):
+        cameraPositionY += 4
+        player.rect.y -= 4*16
+
+    if ((player.rect.y < 16) ):
+        cameraPositionY -= 4
+        player.rect.y += 4*16 
+        
 
 
 
