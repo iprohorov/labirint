@@ -3,6 +3,7 @@
 import sys
 import pygame
 from random import randint
+from player import Player
 sys.setrecursionlimit(10000)
 
 class Wall (pygame.sprite.Sprite): 
@@ -232,23 +233,24 @@ size = width, height = 1366, 768
 # size = width, height = 640, 480
 titleSize = 16
 speed = [2, 2]
-backcolor = 41, 75, 60
+backcolor = 71, 45, 60
 screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 map = Labyrinth(screen,200,200) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
-steepX = 0
-steepY = 0
-Walls= pygame.sprite.Group() 
+cameraPositionX = 0
+cameraPositionY = 0
+Walls= pygame.sprite.Group()
+player = Player();
 
 
 
 def DrawMAP ():
-    if (steepX+int(width/16)+1) > xSize:
+    if (cameraPositionX+int(width/16)+1) > xSize:
         #print ("StopX")
         return False
 
-    if (steepY+int(height/16)+1) > ySize:
+    if (cameraPositionY+int(height/16)+1) > ySize:
         #print ("StopY")
         return False
 
@@ -260,28 +262,38 @@ def DrawMAP ():
     #     print (row)
 
     
-    for x in range (steepX,steepX+int(width/16)+1):
-        for y in range (steepY,steepY+int(height/16)+1):
+    for x in range (cameraPositionX,cameraPositionX+int(width/16)+1):
+        for y in range (cameraPositionY,cameraPositionY+int(height/16)+1):
             if (wallMap[y][x]):
                 #print (x,y)
-                Walls.add(Wall((x-steepX)*16,(y-steepY)*16))
+                Walls.add(Wall((x-cameraPositionX)*16,(y-cameraPositionY)*16))
 
     return True
 
 while 1:
-    
-    screen.fill(backcolor)
-    DrawMAP()
-    Walls.draw(screen)
-    pygame.display.update()
+    #event 
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                steepX -= 1
+                player.MoveLeft()
+                #cameraPositionX -= 1
             if event.key == pygame.K_RIGHT:
-                steepX += 1
+                player.MoveRight()
+                #cameraPositionX += 1
+            if event.key == pygame.K_DOWN:
+                player.MoveDown()
+                #cameraPositionY += 1
+            if event.key == pygame.K_UP:
+                player.MoveUp()
+                #cameraPositionY -= 1
+    #drawing
+    screen.fill(backcolor)
+    DrawMAP()
+    Walls.draw(screen)
+    screen.blit(player.image, player.rect)
+    pygame.display.update()
 
 
 
