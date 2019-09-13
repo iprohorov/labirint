@@ -196,7 +196,7 @@ class Labyrinth ():
         for x in range (self.sizeY):
             for y in range (self.sizeX):
                 if self.labyrinth[y][x].wall[1]:
-                    print (x,y)
+                    #print (x,y)
                     for i in range (scaleX):
                         wallMap[x*scaleY][y*scaleX+i] = 1
 
@@ -246,6 +246,15 @@ player = Player();
 
 
 def DrawMAP ():
+    # global cameraPositionX
+    # global cameraPositionY
+
+    # if(cameraPositionX < 0):
+    #     cameraPositionX = 0
+
+    # if(cameraPositionY < 0):
+    #     cameraPositionY = 0
+
     if (cameraPositionX+int(width/16)+1) > xSize:
         #print ("StopX")
         return False
@@ -278,16 +287,16 @@ while 1:
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player.MoveLeft()
+                player.MoveLeft(Walls)
                 #cameraPositionX += 1
             if event.key == pygame.K_RIGHT:
-                player.MoveRight()
+                player.MoveRight(Walls)
                 #cameraPositionX -= 1
             if event.key == pygame.K_DOWN:
-                player.MoveDown()
+                player.MoveDown(Walls)
                 #cameraPositionY -= 1
             if event.key == pygame.K_UP:
-                player.MoveUp()
+                player.MoveUp(Walls)
                 #cameraPositionY += 1
     #drawing
     screen.fill(backcolor)
@@ -298,23 +307,26 @@ while 1:
 
     #camera update
     # camera left palaer rig
-    
-    if ((player.rect.x > 16*4) ):
-        cameraPositionX += 4
-        player.rect.x -= 4*16
+    cameraShiftX = int((width/16)/2)
+    cameraShiftY = int((height/16)/2)
+    if (True):
 
-    if ((player.rect.x < 16) ):
-        cameraPositionX -= 4
-        player.rect.x += 4*16 
+        if ((player.rect.x > 16*cameraShiftX) ):    #depends in screen size
+            cameraPositionX += cameraShiftX
+            player.rect.x -= cameraShiftX*16
 
-    if ((player.rect.y > 16*4) ):
-        cameraPositionY += 4
-        player.rect.y -= 4*16
+        if ((player.rect.x < 16 ) and (cameraPositionX != 0)):
+            cameraPositionX -= cameraShiftX
+            player.rect.x += cameraShiftX*16 
 
-    if ((player.rect.y < 16) ):
-        cameraPositionY -= 4
-        player.rect.y += 4*16 
-        
+        if ((player.rect.y > 16*cameraShiftY) ):
+            cameraPositionY += cameraShiftY
+            player.rect.y -= cameraShiftY*16
+
+        if ((player.rect.y < 16) and (cameraPositionY != 0)):
+            cameraPositionY -= cameraShiftY
+            player.rect.y += cameraShiftY*16 
+            
 
 
 
