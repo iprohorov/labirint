@@ -260,7 +260,7 @@ class Camera :
             self.cameraShiftX = int((width/16)/2)
             
                
-    def update(self, player, xSize, ySize):
+    def update(self, player, xSize, ySize): # if croossing  position update camera
         self.cameraShiftX = int((width/16)/2)
         self.cameraShiftY = int((height/16)/2)
 
@@ -314,8 +314,8 @@ size = width, height = 640, 480
 titleSize = 16
 speed = [2, 2]
 backcolor = 71, 45, 60
-screen = pygame.display.set_mode(size)
-map = Labyrinth(screen,5,5) #50 50
+screen = pygame.display.set_mode(size,)
+map = Labyrinth(screen,10,10) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
 camera = Camera(size)
@@ -390,6 +390,7 @@ while 1:
     screen.fill(backcolor)
     DrawMAP(camera)
     Walls.draw(screen)
+    player.update()
     screen.blit(player.image, player.rect)
     pygame.display.update()
 
