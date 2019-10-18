@@ -224,28 +224,114 @@ class Labyrinth ():
         # pygame.display.update()
 
 
+class Camera :
+    def __init__(self, size):
+        self.size = size
 
+        width, height = size
+        
+        self.cameraShiftX = int((width/16)/2)
+        self.cameraShiftY = int((height/16)/2)
+        
+        self.cameraPositionX = 0
+        self.cameraPositionY = 0
+
+        self.privCameraPositionX = 0
+        self.privCameraPositionY = 0
+
+    def GetCameraShiftY(self, direction):
+        if  direction == "Down":
+            self.cameraShiftY = ySize - (self.cameraPositionY + int(height/16))
+        else:
+            print("UP work")
+            self.cameraShiftY = self.cameraPositionY
+
+        if self.cameraShiftY > int((height/16)/2):
+            self.cameraShiftY = int((height/16)/2)
+            
+    def GetCameraShiftX(self, direction):
+        if  direction == "Left":
+            self.cameraShiftX = xSize - (self.cameraPositionX + int(width/16))
+        else:
+            print("UP work")
+            self.cameraShiftX = self.cameraPositionX
+
+        if self.cameraShiftX > int((width/16)/2):
+            self.cameraShiftX = int((width/16)/2)
+            
+               
+    def update(self, player, xSize, ySize):
+        self.cameraShiftX = int((width/16)/2)
+        self.cameraShiftY = int((height/16)/2)
+
+        
+
+        print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
+        
+        if ((player.rect.x > 16*self.cameraShiftX)):    #depends in screen size # add(cameraPositionX+int(width/16)+1) > xSize
+            self.GetCameraShiftX("Left")
+            self.privCameraPositionX = self.cameraPositionX
+            self.cameraPositionX += self.cameraShiftX
+            player.rect.x -= self.cameraShiftX*16
+
+        if ((player.rect.x < 16 ) and (self.cameraPositionX != 0)):
+            self.GetCameraShiftX("Right")
+            self.privCameraPositionX = self.cameraPositionX 
+            self.cameraPositionX -= self.cameraShiftX
+            player.rect.x += self.cameraShiftX*16 
+
+        if ((player.rect.y > 16*self.cameraShiftY) ):
+            self.GetCameraShiftY("Down")
+            self.privCameraPositionY = self.cameraPositionY
+            self.cameraPositionY += self.cameraShiftY
+            player.rect.y -= self.cameraShiftY*16
+
+        if ((player.rect.y < 16) and (self.cameraPositionY != 0)):
+            self.GetCameraShiftY("Up")
+            self.privCameraPositionY = self.cameraPositionY
+            self.cameraPositionY -= self.cameraShiftY
+            player.rect.y += self.cameraShiftY*16
+
+        if (camera.cameraPositionX+int(width/16)+1) > xSize: # xSize full labirinth size in block 
+            print ("X end")
+            #camera.cameraPositionX = camera.privCameraPositionX
+            #player.rect.x = privPlayerX
+
+        if (camera.cameraPositionY+int(height/16)+1) > ySize:
+            print ("Y end")
+            #camera.cameraPositionY = camera.privCameraPositionY
+            #player.rect.y = privPlayerY
+
+
+        
+        
 #map.generate()
 
 pygame.init()
 
-size = width, height = 1366, 768
-# size = width, height = 640, 480
+#size = width, height = 1366, 768
+size = width, height = 640, 480
 titleSize = 16
 speed = [2, 2]
 backcolor = 71, 45, 60
-screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-map = Labyrinth(screen,200,200) #50 50
+screen = pygame.display.set_mode(size)
+map = Labyrinth(screen,5,5) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
+camera = Camera(size)
 cameraPositionX = 0
 cameraPositionY = 0
+
+privCameraPositionX = 0
+privCameraPositionY = 0
+
+
 Walls= pygame.sprite.Group()
-player = Player();
+player = Player()
 
 
 
-def DrawMAP ():
+def DrawMAP (camera):
     # global cameraPositionX
     # global cameraPositionY
 
@@ -255,27 +341,29 @@ def DrawMAP ():
     # if(cameraPositionY < 0):
     #     cameraPositionY = 0
 
-    if (cameraPositionX+int(width/16)+1) > xSize:
-        #print ("StopX")
-        return False
-
-    if (cameraPositionY+int(height/16)+1) > ySize:
-        #print ("StopY")
-        return False
-
+    # print (xSize,ySize)
     
     # Walls.clear(screen)
     Walls.empty()
-
+    # print(Darw)
     # for row in wallMap:
     #     print (row)
+    fullScreenSizeX = camera.cameraPositionX+int(width/16)+1 # number cells in x 
+    fullScreenSizeY = camera.cameraPositionY+int(height/16)+1 # number cells in x 
 
+    if (fullScreenSizeY>len(wallMap)):
+        fullScreenSizeY = len(wallMap)
+    if (fullScreenSizeX>len(wallMap[0])):
+        fullScreenSizeX = len(wallMap[0])
     
-    for x in range (cameraPositionX,cameraPositionX+int(width/16)+1):
-        for y in range (cameraPositionY,cameraPositionY+int(height/16)+1):
+        
+    
+    for x in range (camera.cameraPositionX,fullScreenSizeX):
+        for y in range (camera.cameraPositionY,fullScreenSizeY):
             if (wallMap[y][x]):
-                #print (x,y)
-                Walls.add(Wall((x-cameraPositionX)*16,(y-cameraPositionY)*16))
+                # print (x,y)
+                Walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16))
+
 
     return True
 
@@ -300,32 +388,15 @@ while 1:
                 #cameraPositionY += 1
     #drawing
     screen.fill(backcolor)
-    DrawMAP()
+    DrawMAP(camera)
     Walls.draw(screen)
     screen.blit(player.image, player.rect)
     pygame.display.update()
 
+    
+
     #camera update
-    # camera left palaer rig
-    cameraShiftX = int((width/16)/2)
-    cameraShiftY = int((height/16)/2)
-    if (True):
-
-        if ((player.rect.x > 16*cameraShiftX) ):    #depends in screen size
-            cameraPositionX += cameraShiftX
-            player.rect.x -= cameraShiftX*16
-
-        if ((player.rect.x < 16 ) and (cameraPositionX != 0)):
-            cameraPositionX -= cameraShiftX
-            player.rect.x += cameraShiftX*16 
-
-        if ((player.rect.y > 16*cameraShiftY) ):
-            cameraPositionY += cameraShiftY
-            player.rect.y -= cameraShiftY*16
-
-        if ((player.rect.y < 16) and (cameraPositionY != 0)):
-            cameraPositionY -= cameraShiftY
-            player.rect.y += cameraShiftY*16 
+    camera.update(player, xSize, ySize)
             
 
 
