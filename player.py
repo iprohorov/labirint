@@ -9,12 +9,14 @@ def LoadImageList (fileNamesList):
 
 
 class Animation:
-    def __init__ (self,framesFiles):
+    def __init__ (self,framesFiles, frameTime):
         self.frames = LoadImageList (framesFiles)
         self.lastUpdateAnimationTime = 0
         self.currentFrame = 0
+        self.frameTime = frameTime
+        self.isPlay = False
     def isNeedApdate(self):
-        if (pygame.time.get_ticks()-self.lastUpdateAnimationTime)>500:
+        if (pygame.time.get_ticks()-self.lastUpdateAnimationTime)>self.frameTime:
             self.currentFrame +=1
             self.lastUpdateAnimationTime = pygame.time.get_ticks()
             if self.currentFrame >= len(self.frames): 
@@ -22,30 +24,26 @@ class Animation:
             return True
         return False
     def getImg(self):
+        if self.isPlay:
+            self.isNeedApdate()
         return self.frames[self.currentFrame]
+    def Start(self):
+        self.isPlay = True
+    def Stop(self):
+        self.currentFrame = 0
+        self.isPlay = False
     # add animation complete add time of animation 
         
 class Player (pygame.sprite.Sprite):
     def __init__ (self, X=16, Y=16, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
-        self.upFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
-        self.leftFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
-        self.rightFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
-        self.downFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
-        
-        self.currentFrame = 0
-        self.image = self.loadedImage[self.currentFrame] 
+        self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],500)
+        self.currentAnimation = self.upGoAnimation
+        self.image = self.currentAnimation.getImg()
         self.rect = self.image.get_rect(center=(X,Y))
-        self.moving = False
-        self.lastUpdateAnimationTime = 0
+
     def update(self):
-        if (pygame.time.get_ticks()-self.lastUpdateAnimationTime)>500:
-            self.currentFrame +=1
-            self.lastUpdateAnimationTime = pygame.time.get_ticks()
-        if self.currentFrame >= len(self.loadedImage): 
-            self.currentFrame = 0
-        print("frame {}".format(self.currentFrame))
-        self.image = self.loadedImage[self.currentFrame] 
+        self.image = self.currentAnimation.getImg()
 
     def MoveLeft (self, Walls):
         self.rect.x -= 16 
@@ -56,10 +54,12 @@ class Player (pygame.sprite.Sprite):
         if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
             self.rect.x -= 16 
     def MoveUp (self, Walls):
+        self.currentAnimation.Start()
         self.rect.y -= 16
         if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
             self.rect.y += 16 
     def MoveDown (self, Walls):
+        self.currentAnimation.Stop()
         self.rect.y += 16
         if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
             self.rect.y -= 16 
