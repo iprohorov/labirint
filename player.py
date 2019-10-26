@@ -1,13 +1,39 @@
 import pygame 
 
-class Player (pygame.sprite.Sprite): 
+def LoadImageList (fileNamesList):
+    imageList = []
+    for fileName in fileNamesList:
+        imageList.append(pygame.image.load(fileName).convert_alpha())
+    return imageList
+
+
+
+class Animation:
+    def __init__ (self,framesFiles):
+        self.frames = LoadImageList (framesFiles)
+        self.lastUpdateAnimationTime = 0
+        self.currentFrame = 0
+    def isNeedApdate(self):
+        if (pygame.time.get_ticks()-self.lastUpdateAnimationTime)>500:
+            self.currentFrame +=1
+            self.lastUpdateAnimationTime = pygame.time.get_ticks()
+            if self.currentFrame >= len(self.frames): 
+                self.currentFrame = 0
+            return True
+        return False
+    def getImg(self):
+        return self.frames[self.currentFrame]
+    # add animation complete add time of animation 
+        
+class Player (pygame.sprite.Sprite):
     def __init__ (self, X=16, Y=16, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
-        imagesUPanimation = ["hero1z.png","hero2z.png","hero3z.png","hero4z.png"]
-        self.loadedImage = []
-        for imgName in imagesUPanimation:
-            self.loadedImage.append(pygame.image.load(imgName).convert_alpha())
-        self.currentFrame = len(self.loadedImage)-1
+        self.upFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
+        self.leftFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
+        self.rightFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
+        self.downFrames = LoadImageList(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"])
+        
+        self.currentFrame = 0
         self.image = self.loadedImage[self.currentFrame] 
         self.rect = self.image.get_rect(center=(X,Y))
         self.moving = False

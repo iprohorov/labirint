@@ -314,7 +314,7 @@ size = width, height = 640, 480
 titleSize = 16
 speed = [2, 2]
 backcolor = 71, 45, 60
-screen = pygame.display.set_mode(size,)
+screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 map = Labyrinth(screen,10,10) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
