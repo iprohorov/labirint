@@ -240,24 +240,28 @@ class Camera :
         self.privCameraPositionY = 0
 
     def GetCameraShiftY(self, direction):
+        defaultShift = int((height/16)/2) - 1 # number cels of shifting camera
         if  direction == "Down":
-            self.cameraShiftY = ySize - (self.cameraPositionY + int(height/16))
+            print ("down")
+            self.cameraShiftY = ySize - (self.cameraPositionY + defaultShift)
         else:
             print("UP work")
             self.cameraShiftY = self.cameraPositionY
 
-        if self.cameraShiftY > int((height/16)/2):
-            self.cameraShiftY = int((height/16)/2)
+        if self.cameraShiftY > defaultShift:
+            self.cameraShiftY = defaultShift
             
     def GetCameraShiftX(self, direction):
+        defaultShift = int((width/16)/2) - 1
         if  direction == "Left":
-            self.cameraShiftX = xSize - (self.cameraPositionX + int(width/16))
+            print("left")
+            self.cameraShiftX = xSize - (self.cameraPositionX + defaultShift)
         else:
-            print("UP work")
+            print("rigt")
             self.cameraShiftX = self.cameraPositionX
 
-        if self.cameraShiftX > int((width/16)/2):
-            self.cameraShiftX = int((width/16)/2)
+        if self.cameraShiftX > defaultShift:
+            self.cameraShiftX = defaultShift
             
                
     def update(self, player, xSize, ySize): # if croossing  position update camera
@@ -268,38 +272,35 @@ class Camera :
         #player.StopMoving()
         
 
-        #print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
+        print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
         
         if ((player.rect.x > 16*self.cameraShiftX)):    #depends in screen size # add(cameraPositionX+int(width/16)+1) > xSize
-            player.StopMoving()
+            print("debug")
             self.GetCameraShiftX("Left")
             self.privCameraPositionX = self.cameraPositionX
             self.cameraPositionX += self.cameraShiftX
-            player.rect.x -= self.cameraShiftX*16
+            player.x -= self.cameraShiftX*16
             return True
 
-        if ((player.rect.x < 16 + 1 ) and (self.cameraPositionX != 0)):
-            player.StopMoving()
+        if ((player.rect.x < 16) and (self.cameraPositionX != 0)):
             self.GetCameraShiftX("Right")
             self.privCameraPositionX = self.cameraPositionX 
             self.cameraPositionX -= self.cameraShiftX
-            player.rect.x += self.cameraShiftX*16
+            player.x += self.cameraShiftX*16
             return True             
 
         if ((player.rect.y > 16*self.cameraShiftY) ):
-            player.StopMoving()
             self.GetCameraShiftY("Down")
             self.privCameraPositionY = self.cameraPositionY
             self.cameraPositionY += self.cameraShiftY
-            player.rect.y -= self.cameraShiftY*16
+            player.y -= self.cameraShiftY*16
             return True
 
-        if ((player.rect.y < 16+1) and (self.cameraPositionY != 0)):
-            player.StopMoving()
+        if ((player.rect.y < 16) and (self.cameraPositionY != 0)):
             self.GetCameraShiftY("Up")
             self.privCameraPositionY = self.cameraPositionY
             self.cameraPositionY -= self.cameraShiftY
-            player.rect.y += self.cameraShiftY*16
+            player.y += self.cameraShiftY*16
             return True
 
         if (camera.cameraPositionX+int(width/16)+1) > xSize: # xSize full labirinth size in block 
@@ -380,9 +381,9 @@ def DrawMAP (camera):
 
 FLAG = True
 isNeeedUpdateLocation = True
+FirstRUN = True
 while 1:
     #event 
-    print ("t1: {}".format(pygame.time.get_ticks()))
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
@@ -413,27 +414,26 @@ while 1:
                 player.StopMoving()
                 #cameraPositionY += 1
     #drawing
-    print ("t2: {}".format(pygame.time.get_ticks()))
     
-    screen.fill(backcolor)
     
-    if isNeeedUpdateLocation:
-        DrawMAP(camera)
-        
-    print ("t3: {}".format(pygame.time.get_ticks()))
-    Walls.draw(screen)
-    print ("t4: {}".format(pygame.time.get_ticks()))
-    player.update(Walls)
-    print ("t5: {}".format(pygame.time.get_ticks()))
-    screen.blit(player.image, player.rect)
-    print ("t6: {}".format(pygame.time.get_ticks()))
-    pygame.display.update()
     
-
     
-
-    #camera update
+    
     isNeeedUpdateLocation = camera.update(player, xSize, ySize)
+    
+    if isNeeedUpdateLocation or FirstRUN:
+        FirstRUN = False
+        DrawMAP(camera)
+    
+    screen.fill(backcolor)    
+    player.update(Walls)
+    
+    
+    
+    Walls.draw(screen)
+   
+    screen.blit(player.image, player.rect)
+    pygame.display.update()
             
 
 
