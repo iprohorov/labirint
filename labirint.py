@@ -263,34 +263,44 @@ class Camera :
     def update(self, player, xSize, ySize): # if croossing  position update camera
         self.cameraShiftX = int((width/16)/2)
         self.cameraShiftY = int((height/16)/2)
-
+        x_speed = player.x_speed
+        y_speed = player.y_speed
+        #player.StopMoving()
         
 
-        print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
+        #print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
         
         if ((player.rect.x > 16*self.cameraShiftX)):    #depends in screen size # add(cameraPositionX+int(width/16)+1) > xSize
+            player.StopMoving()
             self.GetCameraShiftX("Left")
             self.privCameraPositionX = self.cameraPositionX
             self.cameraPositionX += self.cameraShiftX
             player.rect.x -= self.cameraShiftX*16
+            return True
 
-        if ((player.rect.x < 16 ) and (self.cameraPositionX != 0)):
+        if ((player.rect.x < 16 + 1 ) and (self.cameraPositionX != 0)):
+            player.StopMoving()
             self.GetCameraShiftX("Right")
             self.privCameraPositionX = self.cameraPositionX 
             self.cameraPositionX -= self.cameraShiftX
-            player.rect.x += self.cameraShiftX*16 
+            player.rect.x += self.cameraShiftX*16
+            return True             
 
         if ((player.rect.y > 16*self.cameraShiftY) ):
+            player.StopMoving()
             self.GetCameraShiftY("Down")
             self.privCameraPositionY = self.cameraPositionY
             self.cameraPositionY += self.cameraShiftY
             player.rect.y -= self.cameraShiftY*16
+            return True
 
-        if ((player.rect.y < 16) and (self.cameraPositionY != 0)):
+        if ((player.rect.y < 16+1) and (self.cameraPositionY != 0)):
+            player.StopMoving()
             self.GetCameraShiftY("Up")
             self.privCameraPositionY = self.cameraPositionY
             self.cameraPositionY -= self.cameraShiftY
             player.rect.y += self.cameraShiftY*16
+            return True
 
         if (camera.cameraPositionX+int(width/16)+1) > xSize: # xSize full labirinth size in block 
             print ("X end")
@@ -301,7 +311,7 @@ class Camera :
             print ("Y end")
             #camera.cameraPositionY = camera.privCameraPositionY
             #player.rect.y = privPlayerY
-
+        return False
 
         
         
@@ -314,8 +324,9 @@ size = width, height = 640, 480
 titleSize = 16
 speed = [2, 2]
 backcolor = 71, 45, 60
-screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
-map = Labyrinth(screen,10,10) #50 50
+#screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
+screen = pygame.display.set_mode(size)
+map = Labyrinth(screen,14,14) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
 camera = Camera(size)
@@ -368,36 +379,61 @@ def DrawMAP (camera):
     return True
 
 FLAG = True
+isNeeedUpdateLocation = True
 while 1:
     #event 
+    print ("t1: {}".format(pygame.time.get_ticks()))
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                player.MoveLeft(Walls)
+                player.MoveLeft()
                 #cameraPositionX += 1
             if event.key == pygame.K_RIGHT:
-                player.MoveRight(Walls)
+                player.MoveRight()
                 #cameraPositionX -= 1
             if event.key == pygame.K_DOWN:
-                player.MoveDown(Walls)
+                player.MoveDown()
                 #cameraPositionY -= 1
             if event.key == pygame.K_UP:
-                player.MoveUp(Walls)
+                player.MoveUp()
+                #cameraPositionY += 1
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LEFT:
+                player.StopMoving()
+                #cameraPositionX += 1
+            if event.key == pygame.K_RIGHT:
+                player.StopMoving()
+                #cameraPositionX -= 1
+            if event.key == pygame.K_DOWN:
+                player.StopMoving()
+                #cameraPositionY -= 1
+            if event.key == pygame.K_UP:
+                player.StopMoving()
                 #cameraPositionY += 1
     #drawing
+    print ("t2: {}".format(pygame.time.get_ticks()))
+    
     screen.fill(backcolor)
-    DrawMAP(camera)
+    
+    if isNeeedUpdateLocation:
+        DrawMAP(camera)
+        
+    print ("t3: {}".format(pygame.time.get_ticks()))
     Walls.draw(screen)
-    player.update()
+    print ("t4: {}".format(pygame.time.get_ticks()))
+    player.update(Walls)
+    print ("t5: {}".format(pygame.time.get_ticks()))
     screen.blit(player.image, player.rect)
+    print ("t6: {}".format(pygame.time.get_ticks()))
     pygame.display.update()
+    
 
     
 
     #camera update
-    camera.update(player, xSize, ySize)
+    isNeeedUpdateLocation = camera.update(player, xSize, ySize)
             
 
 
