@@ -40,7 +40,7 @@ class Animation:
 class Player (pygame.sprite.Sprite):
     def __init__ (self, X=32, Y=32, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
-        #self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
+        self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
         self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
         self.rightGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100)
         self.leftGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100, True)
@@ -88,8 +88,8 @@ class Player (pygame.sprite.Sprite):
         self.x_speed = 0.1
         
     def MoveUp (self):
-        # self.currentAnimation = self.upGoAnimation
-        # self.currentAnimation.Start()
+        self.currentAnimation = self.upGoAnimation
+        self.currentAnimation.Start()
         self.y_speed = -0.1
         
     def MoveDown (self):
