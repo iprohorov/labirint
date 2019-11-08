@@ -187,32 +187,52 @@ class Labyrinth ():
             for line in lines:
                 sys.stdout.write(line+"\r\n")
 
+
+    def _drawDownwall (self, x, y):
+        for i in range (self.scaleX):
+            self.wallMap[x*self.scaleY+(self.scaleY-1)][y*self.scaleX+i] = 1
+    
+    def _drawUpwall (self, x, y):
+        for i in range (self.scaleX):
+            self.wallMap[x*self.scaleY][y*self.scaleX+i] = 1
+    
+    def _drawLeftwall (self, x, y):
+        for i in range (self.scaleY):
+            self.wallMap[x*self.scaleY+i][y*self.scaleX] = 1
+    
+    def _drawRightwall (self, x, y):
+        for i in range (self.scaleY):
+            self.wallMap[x*self.scaleY+i][y*self.scaleX + (self.scaleX-1)] = 1
+    
+
+
     def draw (self):
-        scaleX = 8
-        scaleY = 8
-        wallMap = [[ 0 for x in range(self.sizeX*scaleY)] for y in range(self.sizeY*scaleX)]
+        self.scaleX = 8
+        self.scaleY = 8
+        self.wallMap = [[ 0 for x in range(self.sizeX*self.scaleY)] for y in range(self.sizeY*self.scaleX)]
         #print (wallMap) # 3 cells 
 
-        for x in range (self.sizeY):
+        for x in range (self.sizeY): # y == x normal
             for y in range (self.sizeX):
-                if self.labyrinth[y][x].wall[1]:
-                    #print (x,y)
-                    for i in range (scaleX):
-                        wallMap[x*scaleY][y*scaleX+i] = 1
-
-                if self.labyrinth[y][x].wall[3]:
-                    for i in range (scaleX):
-                        wallMap[scaleY-1+x*scaleY][y*scaleX+i] = 1
-                
-                if self.labyrinth[y][x].wall[0]:
-                    for i in range (scaleY):
-                         wallMap[x*scaleY+i][y*scaleX] = 1
-
-                if self.labyrinth[y][x].wall[2]:
-                    for i in range (scaleY):
-                        wallMap[x*scaleY+i][y*scaleX+scaleX-1] = 1
-        
-        return (wallMap.copy(), self.sizeX*scaleX, self.sizeY*scaleY) # first y second Y
+                if x == 0:
+                    self._drawUpwall(x,y)
+                    if self.labyrinth[y][x].wall[3]:
+                        self._drawDownwall(x,y)
+                elif x == self.sizeX-1:
+                    self._drawDownwall(x,y)
+                else:
+                    if self.labyrinth[y][x].wall[3]:
+                        self._drawDownwall(x,y)
+                if y == 0:
+                    self._drawLeftwall(x,y)
+                    if self.labyrinth[y][x].wall[2]:
+                        self._drawRightwall(x,y)
+                elif y == self.sizeY-1:
+                    self._drawRightwall(x,y)
+                else:
+                    if self.labyrinth[y][x].wall[2]:
+                        self._drawRightwall(x,y)
+        return (self.wallMap.copy(), self.sizeX*self.scaleX, self.sizeY*self.scaleY) # first y second Y
 
         # for row in wallMap:
         #     print (row)
@@ -272,7 +292,7 @@ class Camera :
         #player.StopMoving()
         
 
-        print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
+        #print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
         
         if ((player.rect.x > 16*self.cameraShiftX)):    #depends in screen size # add(cameraPositionX+int(width/16)+1) > xSize
             print("debug")
@@ -304,12 +324,14 @@ class Camera :
             return True
 
         if (camera.cameraPositionX+int(width/16)+1) > xSize: # xSize full labirinth size in block 
-            print ("X end")
+            pass
+            #print ("X end")
             #camera.cameraPositionX = camera.privCameraPositionX
             #player.rect.x = privPlayerX
 
         if (camera.cameraPositionY+int(height/16)+1) > ySize:
-            print ("Y end")
+            pass
+            #print ("Y end")
             #camera.cameraPositionY = camera.privCameraPositionY
             #player.rect.y = privPlayerY
         return False
@@ -327,7 +349,7 @@ speed = [2, 2]
 backcolor = 71, 45, 60
 #screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 screen = pygame.display.set_mode(size)
-map = Labyrinth(screen,14,14) #50 50
+map = Labyrinth(screen,2,2) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
 camera = Camera(size)

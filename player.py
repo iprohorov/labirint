@@ -60,13 +60,20 @@ class Player (pygame.sprite.Sprite):
     def update(self, Walls):
         dt = pygame.time.get_ticks() - self.privUpdateTime
         self.privUpdateTime = pygame.time.get_ticks()
-        self.x += dt*self.x_speed
-        self.y += dt*self.y_speed
-        self.image = self.currentAnimation.getImg()
         if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
-            #self.x -= dt*self.x_speed+1
-            #self.y -= dt*self.y_speed+1
+            if self.x_speed > 0:
+                self.x -= 1
+            elif self.x_speed < 0:
+                self.x += 1
+            if self.y_speed > 0:
+                self.y -= 1
+            elif self.y_speed < 0:
+                self.y += 1
             self.StopMoving()
+        else:
+            self.x += dt*self.x_speed
+            self.y += dt*self.y_speed
+        self.image = self.currentAnimation.getImg()
         self.rect.x = self.x
         self.rect.y = self.y
 
