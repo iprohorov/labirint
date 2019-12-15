@@ -97,4 +97,85 @@ class Player (pygame.sprite.Sprite):
         self.currentAnimation.Start()
         self.y_speed = 0.1
         
+class Mob (pygame.sprite.Sprite):
+    def __init__ (self, X=32, Y=32, cameraPositionX = 0, cameraPositionY = 0):
+        pygame.sprite.Sprite.__init__(self)
+        self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
+        self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
+        self.rightGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100)
+        self.leftGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100, True)
+        self.currentAnimation = self.downGoAnimation
+        self.image = self.currentAnimation.getImg()
+        self.rect = self.image.get_rect(center=(X,Y))
+        self.x_speed = 0
+        self.y_speed = 0
+        self.x:float = X
+        self.y:float = Y
+        self.privUpdateTime = 0
+        self.state = None
+        
+    def StopMoving(self):
+        self.currentAnimation.Stop()
+        self.x_speed = 0
+        self.y_speed = 0 
+    def update(self, Walls, player_x_sc, player_y_sc):
+        self.player_x_sc = player_x_sc
+        self.player_y_sc = player_y_sc
+        next_state = self.Intelect()
+        if ((self.state is None) or (self.state != next_state)):
+            print("Mob")
+            self.state = next_state
+            self.state()
+        dt = pygame.time.get_ticks() - self.privUpdateTime
+        self.privUpdateTime = pygame.time.get_ticks()
+        if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0): # add mobs
+            if self.x_speed > 0:
+                self.x -= 1
+            elif self.x_speed < 0:
+                self.x += 1
+            if self.y_speed > 0:
+                self.y -= 1
+            elif self.y_speed < 0:
+                self.y += 1
+            self.StopMoving()
+        else:
+            self.x += dt*self.x_speed
+            self.y += dt*self.y_speed
+        self.image = self.currentAnimation.getImg()
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+    def MoveLeft (self):
+        self.currentAnimation = self.leftGoAnimation 
+        self.currentAnimation.Start()
+        self.x_speed = -0.1
+         
+    def MoveRight (self):
+        self.currentAnimation = self.rightGoAnimation 
+        self.currentAnimation.Start()
+        self.x_speed = 0.1
+        
+    def MoveUp (self):
+        self.currentAnimation = self.upGoAnimation
+        self.currentAnimation.Start()
+        self.y_speed = -0.1
+        
+    def MoveDown (self):
+        self.currentAnimation = self.downGoAnimation 
+        self.currentAnimation.Start()
+        self.y_speed = 0.1
+    
+    def Intelect (self): #return NextState
+        if (self.player_x_sc - self.x > 32):
+            return self.MoveRight
+        elif (self.player_x_sc - self.x < -32):
+            return self.MoveLeft
+        elif (self.player_y_sc - self.y > 32):
+            return self.MoveDown
+        elif (self.player_y_sc - self.y < -32):
+            return self.MoveUp
+        else:
+            return self.StopMoving
+        
+
         

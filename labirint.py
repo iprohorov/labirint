@@ -4,6 +4,7 @@ import sys
 import pygame
 from random import randint
 from player import Player
+from player import Mob
 sys.setrecursionlimit(10000)
 
 class Wall (pygame.sprite.Sprite): 
@@ -233,17 +234,7 @@ class Labyrinth ():
                     if self.labyrinth[y][x].wall[2]:
                         self._drawRightwall(x,y)
         return (self.wallMap.copy(), self.sizeX*self.scaleX, self.sizeY*self.scaleY) # first y second Y
-
-        # for row in wallMap:
-        #     print (row)
-        # for x in range (self.sizeX*scaleX):
-        #     for y in range (self.sizeY*scaleY):
-        #         if (wallMap[y][x]):
-        #             pygame.draw.rect(screen, (255, 255, 255), (x*10, y*10, 10, 10))
-
-        # pygame.display.update()
-
-
+        
 class Camera :
     def __init__(self, size):
         self.size = size
@@ -349,7 +340,7 @@ speed = [2, 2]
 backcolor = 71, 45, 60
 #screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 screen = pygame.display.set_mode(size)
-map = Labyrinth(screen,2,2) #50 50
+map = Labyrinth(screen,20,20) #50 50
 map.dbgPrint()
 wallMap, xSize, ySize = map.draw()
 camera = Camera(size)
@@ -362,6 +353,8 @@ privCameraPositionY = 0
 
 Walls= pygame.sprite.Group()
 player = Player()
+mob = Mob(X=64, Y=64)
+
 
 
 
@@ -449,12 +442,14 @@ while 1:
     
     screen.fill(backcolor)    
     player.update(Walls)
+    mob.update(Walls, player.x, player.y)
     
     
     
     Walls.draw(screen)
    
     screen.blit(player.image, player.rect)
+    screen.blit(mob.image, mob.rect)
     pygame.display.update()
             
 
