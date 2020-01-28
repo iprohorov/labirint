@@ -251,7 +251,7 @@ class Camera :
         self.privCameraPositionY = 0
 
     def GetCameraShiftY(self, direction):
-        defaultShift = int((height/16)/2) - 1 # number cels of shifting camera
+        defaultShift = int((height/16)/2) - 1 # number cels of shifting camera # need update for normal camera
         if  direction == "Down":
             print ("down")
             self.cameraShiftY = ySize - (self.cameraPositionY + defaultShift)
@@ -263,68 +263,95 @@ class Camera :
             self.cameraShiftY = defaultShift
             
     def GetCameraShiftX(self, direction):
-        defaultShift = int((width/16)/2) - 1
+        defaultShift = int((width/16)/2)
         if  direction == "Left":
             print("left")
-            self.cameraShiftX = xSize - (self.cameraPositionX + defaultShift)
+            self.cameraShiftX = xSize - (self.cameraPositionX + int(width/16))
         else:
             print("rigt")
             self.cameraShiftX = self.cameraPositionX
 
         if self.cameraShiftX > defaultShift:
             self.cameraShiftX = defaultShift
-            
-               
-    def update(self, player, xSize, ySize): # if croossing  position update camera
-        self.cameraShiftX = int((width/16)/2)
-        self.cameraShiftY = int((height/16)/2)
-        x_speed = player.x_speed
-        y_speed = player.y_speed
-        #player.StopMoving()
-        
+    
+    def handle_mod_position_left(self, mob):
+        """ Return del mob or no
+        """
+        if (self.cameraPositionX <= int(mob.x)):
+            print("Kill mob")
+            mob.remove()
+            return True
+        else:
+            mob.x -= self.cameraShiftX*16
+            return False
 
-        #print ("y: {} {}".format(self.cameraShiftY, self.cameraPositionY ))
+    def handle_mod_position_right(self, mob):
+        """ Return del mob or no
+        """
+        if (self.cameraPositionX <= width - int(mob.x)):
+            print("Kill mob")
+            mob.remove()
+            return True
+        else:
+            mob.x -= self.cameraShiftX*16
+            return False
+
+    def handle_mod_position_up(self, mob):
+        pass 
+
+    def handle_mod_position_down(self, mob):
+        pass
+
+    def update_mobs_position(self, mobs_list, direction):
+        if (mobs_list is None) or mobs_list == []:
+            print ("no mobs")
+            return None
+        if direction == "Left":
+            for mob in mobs_list:
+                if self.handle_mod_position_left(mob):
+                    mobs_list.remove(mob)
+        if direction == "Right":
+            for mob in mobs_list:
+                if self.handle_mod_position_right(mob):
+                    mobs_list.remove(mob)
+
+    
+    def update(self, player, xSize, ySize, mobs_list = None): # if croossing  position update camera
         
-        if ((player.rect.x > 16*self.cameraShiftX)):    #depends in screen size # add(cameraPositionX+int(width/16)+1) > xSize
+        shift_left_trashold = width-(16*4)  #when start scroling
+        shift_right_trashold = 16*2
+        shift_down_trashold = height-(16*4) 
+        shift_up_trashold = 16*2
+
+        if ((player.rect.x > shift_left_trashold) and  (xSize*16 - self.cameraPositionX*16 - width > 0)): 
             print("debug")
-            self.GetCameraShiftX("Left")
+            self.GetCameraShiftX("Left") # error right ?
             self.privCameraPositionX = self.cameraPositionX
             self.cameraPositionX += self.cameraShiftX
             player.x -= self.cameraShiftX*16
+            self.update_mobs_position(mobs_list,"Left")
             return True
 
-        if ((player.rect.x < 16) and (self.cameraPositionX != 0)):
+        if ((player.rect.x < shift_right_trashold) and (self.cameraPositionX != 0)):
             self.GetCameraShiftX("Right")
             self.privCameraPositionX = self.cameraPositionX 
             self.cameraPositionX -= self.cameraShiftX
             player.x += self.cameraShiftX*16
             return True             
 
-        if ((player.rect.y > 16*self.cameraShiftY) ):
+        if ((player.rect.y > shift_down_trashold) and  (ySize*16 - self.cameraPositionY*16 - height > 0)):
             self.GetCameraShiftY("Down")
             self.privCameraPositionY = self.cameraPositionY
             self.cameraPositionY += self.cameraShiftY
             player.y -= self.cameraShiftY*16
             return True
 
-        if ((player.rect.y < 16) and (self.cameraPositionY != 0)):
+        if ((player.rect.y < shift_up_trashold) and (self.cameraPositionY != 0)):
             self.GetCameraShiftY("Up")
             self.privCameraPositionY = self.cameraPositionY
             self.cameraPositionY -= self.cameraShiftY
             player.y += self.cameraShiftY*16
             return True
-
-        if (camera.cameraPositionX+int(width/16)+1) > xSize: # xSize full labirinth size in block 
-            pass
-            #print ("X end")
-            #camera.cameraPositionX = camera.privCameraPositionX
-            #player.rect.x = privPlayerX
-
-        if (camera.cameraPositionY+int(height/16)+1) > ySize:
-            pass
-            #print ("Y end")
-            #camera.cameraPositionY = camera.privCameraPositionY
-            #player.rect.y = privPlayerY
         return False
 
         
@@ -340,9 +367,9 @@ speed = [2, 2]
 backcolor = 71, 45, 60
 #screen = pygame.display.set_mode(size,pygame.FULLSCREEN)
 screen = pygame.display.set_mode(size)
-map = Labyrinth(screen,20,20) #50 50
-map.dbgPrint()
-wallMap, xSize, ySize = map.draw()
+location = Labyrinth(screen,5,5) #50 50
+location.dbgPrint()
+wallMap, xSize, ySize = location.draw()
 camera = Camera(size)
 cameraPositionX = 0
 cameraPositionY = 0
@@ -353,7 +380,7 @@ privCameraPositionY = 0
 
 Walls= pygame.sprite.Group()
 player = Player()
-mob = Mob(X=64, Y=64)
+current_mobs = [Mob(X=64, Y=64)]
 
 
 
@@ -388,7 +415,6 @@ def DrawMAP (camera):
     for x in range (camera.cameraPositionX,fullScreenSizeX):
         for y in range (camera.cameraPositionY,fullScreenSizeY):
             if (wallMap[y][x]):
-                # print (x,y)
                 Walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16))
 
 
@@ -397,59 +423,51 @@ def DrawMAP (camera):
 FLAG = True
 isNeeedUpdateLocation = True
 FirstRUN = True
-while 1:
-    #event 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
 
+
+while 1:
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: 
+            sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 player.MoveLeft()
-                #cameraPositionX += 1
             if event.key == pygame.K_RIGHT:
                 player.MoveRight()
-                #cameraPositionX -= 1
             if event.key == pygame.K_DOWN:
                 player.MoveDown()
-                #cameraPositionY -= 1
             if event.key == pygame.K_UP:
                 player.MoveUp()
-                #cameraPositionY += 1
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
                 player.StopMoving()
-                #cameraPositionX += 1
             if event.key == pygame.K_RIGHT:
                 player.StopMoving()
-                #cameraPositionX -= 1
             if event.key == pygame.K_DOWN:
                 player.StopMoving()
-                #cameraPositionY -= 1
             if event.key == pygame.K_UP:
                 player.StopMoving()
-                #cameraPositionY += 1
-    #drawing
-    
-    
-    
-    
-    
-    isNeeedUpdateLocation = camera.update(player, xSize, ySize)
-    
+
+    isNeeedUpdateLocation = camera.update(player, xSize, ySize, current_mobs)
     if isNeeedUpdateLocation or FirstRUN:
         FirstRUN = False
         DrawMAP(camera)
     
     screen.fill(backcolor)    
     player.update(Walls)
-    mob.update(Walls, player.x, player.y)
+
+    for mob in current_mobs:
+        mob.update(Walls, player.x, player.y)
     
     
     
     Walls.draw(screen)
    
     screen.blit(player.image, player.rect)
-    screen.blit(mob.image, mob.rect)
+
+    for mob in current_mobs:
+        screen.blit(mob.image, mob.rect)
     pygame.display.update()
             
 

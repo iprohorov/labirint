@@ -74,8 +74,7 @@ class Player (pygame.sprite.Sprite):
             self.x += dt*self.x_speed
             self.y += dt*self.y_speed
         self.image = self.currentAnimation.getImg()
-        self.rect.x = self.x
-        self.rect.y = self.y
+        self.rect.topleft = (int(self.x), int(self.y))
 
     def MoveLeft (self):
         self.currentAnimation = self.leftGoAnimation 
@@ -169,7 +168,7 @@ class Mob (pygame.sprite.Sprite):
         if (self.player_x_sc - self.x > 32):
             return self.MoveRight
         elif (self.player_x_sc - self.x < -32):
-            return self.MoveLeft
+             return self.StopMoving
         elif (self.player_y_sc - self.y > 32):
             return self.MoveDown
         elif (self.player_y_sc - self.y < -32):
