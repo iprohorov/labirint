@@ -381,7 +381,7 @@ privCameraPositionY = 0
 Walls= pygame.sprite.Group()
 player = Player()
 current_mobs = [Mob(X=64, Y=64)]
-
+light=pygame.image.load('light.png')
 
 
 
@@ -468,7 +468,13 @@ while 1:
 
     for mob in current_mobs:
         screen.blit(mob.image, mob.rect)
-    pygame.display.update()
+
+    filter = pygame.surface.Surface((width+100, height+100))
+    filter.fill(pygame.color.Color('Grey'))
+    filter.blit(light, (int(player.x), int(player.y)))
+    screen.blit(filter, (-42, -42), special_flags=pygame.BLEND_RGBA_SUB)
+    pygame.display.flip()
+    #pygame.display.update()
             
 
 
