@@ -116,7 +116,7 @@ class Player (pygame.sprite.Sprite):
         self.y_speed = 0.1
         
 class Mob (pygame.sprite.Sprite):
-    def __init__ (self, x_start_global, y_start_global, cameraPositionX = 0, cameraPositionY = 0):
+    def __init__ (self, x_start_global, y_start_global, Walls, current_Mobs, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
         self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
         self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
@@ -127,7 +127,9 @@ class Mob (pygame.sprite.Sprite):
         self.currentAnimation = self.downGoAnimation
         self.image = self.currentAnimation.getImg()
         self.rect = self.image.get_rect(center=(0,0))
-        self.isVisable = False  
+        self.isVisable = False
+        self.Walls = Walls
+        self.current_Mobs = current_Mobs
         self.x_speed = 0
         self.y_speed = 0
         self.x:float = 0
@@ -141,7 +143,7 @@ class Mob (pygame.sprite.Sprite):
         self.currentAnimation.Stop()
         self.x_speed = 0
         self.y_speed = 0 
-    def update(self, Walls, player_x_sc, player_y_sc, cameraPositionX, cameraPositionY, size):
+    def update(self, player_x_sc, player_y_sc, cameraPositionX, cameraPositionY, size):
         width, height = size
         if not self.isVisable:
             if (cameraPositionX*16 < (self.global_position_x) <  cameraPositionX*16+width) and (cameraPositionY*16 < (self.global_position_y) <  cameraPositionY*16+height):
@@ -158,6 +160,8 @@ class Mob (pygame.sprite.Sprite):
         if not self.isVisable:
             self.kill()
             return -1 
+        else:
+            self.current_Mobs.add(self)
 
 
         self.player_x_sc = player_x_sc
@@ -172,7 +176,7 @@ class Mob (pygame.sprite.Sprite):
             self.state()
         dt = pygame.time.get_ticks() - self.privUpdateTime
         self.privUpdateTime = pygame.time.get_ticks()
-        if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0): # add mobs
+        if (len (pygame.sprite.spritecollide(self,self.Walls,False)) > 0): # add mobs
             if self.x_speed > 0:
                 self.x -= 5
             elif self.x_speed < 0:
