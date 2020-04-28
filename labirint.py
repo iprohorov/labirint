@@ -130,8 +130,8 @@ class Camera :
 
 pygame.init()
 
-#size = width, height = 1366, 768
-size = width, height = 640, 480
+size = width, height = 1366, 768
+#size = width, height = 1920, 1080
 titleSize = 16
 speed = [2, 2]
 backcolor = 71, 45, 60
@@ -149,9 +149,11 @@ privCameraPositionX = 0
 privCameraPositionY = 0
 
 
-Walls= pygame.sprite.Group()
+Walls = pygame.sprite.Group()
+Mobs =pygame.sprite.Group()
 player = Player()
-current_mobs = [Mob(64, 64)]
+current_mobs = [Mob(64+x*16, 64+16*x) for x in range(1)]
+
 light=pygame.image.load('light.png')
 
 pygame.font.init()
@@ -222,6 +224,13 @@ while 1:
                 player.StopMoving()
             if event.key == pygame.K_UP:
                 player.StopMoving()
+            if event.key == pygame.K_a:
+                player.LeftAtack()
+            if event.key == pygame.K_d:
+                player.RightAtack()
+            if event.key == pygame.K_e:
+                print(pygame.sprite.spritecollideany(player,Walls))
+
 
     isNeeedUpdateLocation = camera.update(player) 
     if isNeeedUpdateLocation or FirstRUN:
@@ -244,10 +253,10 @@ while 1:
         if mob.isVisable:
             screen.blit(mob.image, mob.rect)
 
-    # filter = pygame.surface.Surface((width+100, height+100))
-    # filter.fill(pygame.color.Color('Grey'))
-    # filter.blit(light, (int(player.x), int(player.y)))
-    # screen.blit(filter, (-42, -42), special_flags=pygame.BLEND_RGBA_SUB)
+    filter = pygame.surface.Surface((width+100, height+100))
+    filter.fill(pygame.color.Color('Grey'))
+    filter.blit(light, (int(player.x), int(player.y)))
+    screen.blit(filter, (-42, -42), special_flags=pygame.BLEND_RGBA_SUB)
     textsurface = myfont.render("Cam {}, {} Mob: {},{} ".format(camera.cameraPositionX, camera.cameraPositionY, int(current_mobs[0].global_position_x), int(current_mobs[0].global_position_y)), False, (255, 0, 0))
     screen.blit(textsurface,(0,0))
     pygame.display.flip()

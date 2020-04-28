@@ -8,12 +8,13 @@ def LoadImageList (fileNamesList):
     return imageList
 
 class Animation:
-    def __init__ (self,framesFiles, frameTime, flipX = False, flipY = False):
+    def __init__ (self,framesFiles, frameTime, flipX = False, flipY = False, shot_animation = True):
         self.frames = LoadImageList (framesFiles)
         self.lastUpdateAnimationTime = 0
         self.currentFrame = 0
         self.frameTime = frameTime
         self.isPlay = False
+        self.shot_animation = shot_animation
         self._Transform(flipX, flipY)
     def _Transform(self, flipX = False, flipY = False):
         for i, frame in enumerate(self.frames):
@@ -24,6 +25,8 @@ class Animation:
             self.lastUpdateAnimationTime = pygame.time.get_ticks()
             if self.currentFrame >= len(self.frames): 
                 self.currentFrame = 0
+                if self.shot_animation:
+                    self.Stop()
             return True
         return False
     def getImg(self):
@@ -44,6 +47,9 @@ class Player (pygame.sprite.Sprite):
         self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
         self.rightGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100)
         self.leftGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100, True)
+        self.leftAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100, True, shot_animation = True)
+        self.rightAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100, shot_animation = True)
+
         self.currentAnimation = self.downGoAnimation
         self.image = self.currentAnimation.getImg()
         self.rect = self.image.get_rect(center=(X,Y))
@@ -81,6 +87,14 @@ class Player (pygame.sprite.Sprite):
         self.image = self.currentAnimation.getImg()
         self.rect.topleft = (int(self.x), int(self.y))
 
+    def LeftAtack(self):
+        self.currentAnimation = self.leftAtackAnimation
+        self.currentAnimation.Start()
+
+    def RightAtack(self):
+        self.currentAnimation = self.rightAtackAnimation
+        self.currentAnimation.Start()
+
     def MoveLeft (self):
         self.currentAnimation = self.leftGoAnimation 
         self.currentAnimation.Start()
@@ -108,6 +122,8 @@ class Mob (pygame.sprite.Sprite):
         self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
         self.rightGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100)
         self.leftGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100, True)
+        self.leftAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100, True)
+        self.rightAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100)
         self.currentAnimation = self.downGoAnimation
         self.image = self.currentAnimation.getImg()
         self.rect = self.image.get_rect(center=(0,0))
@@ -140,6 +156,7 @@ class Mob (pygame.sprite.Sprite):
                 self.isVisable = False 
 
         if not self.isVisable:
+            self.kill()
             return -1 
 
 
@@ -157,13 +174,13 @@ class Mob (pygame.sprite.Sprite):
         self.privUpdateTime = pygame.time.get_ticks()
         if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0): # add mobs
             if self.x_speed > 0:
-                self.x -= 1
+                self.x -= 5
             elif self.x_speed < 0:
-                self.x += 1
+                self.x += 5
             if self.y_speed > 0:
-                self.y -= 1
+                self.y -= 5
             elif self.y_speed < 0:
-                self.y += 1
+                self.y += 5
             self.StopMoving()
         else:
             self.x += dt*self.x_speed
@@ -190,6 +207,14 @@ class Mob (pygame.sprite.Sprite):
         self.currentAnimation = self.upGoAnimation
         self.currentAnimation.Start()
         self.y_speed = -0.1
+
+    def LeftAtack(self):
+        self.currentAnimation = self.leftAtackAnimation
+        self.currentAnimation.Start()
+
+    def RightAtack(self):
+        self.currentAnimation = self.rightAtackAnimation
+        self.currentAnimation.Start()
         
     def MoveDown (self):
         self.currentAnimation = self.downGoAnimation 
