@@ -1,6 +1,7 @@
 
 import pygame
 import labirint_gen
+import TimeObjects
 from player import Player
 from player import Mob
 
@@ -12,7 +13,7 @@ class Wall (pygame.sprite.Sprite):
     def clear_callback(surf, rect):
         color = 0, 0, 0
         surf.fill(color, rect)
-       
+
 class Camera :
     def __init__(self, size, xSize, ySize):
         self.size = size
@@ -132,6 +133,7 @@ pygame.init()
 
 size = width, height = 1366, 768
 #size = width, height = 1920, 1080
+is_light_on = False
 titleSize = 16
 speed = [2, 2]
 backcolor = 71, 45, 60
@@ -150,10 +152,12 @@ privCameraPositionY = 0
 
 
 Walls = pygame.sprite.Group()
-current_Mobs =pygame.sprite.Group()
-player = Player()
+current_Mobs = pygame.sprite.Group()
+time_object = pygame.sprite.Group()
+
+player = Player(current_Mobs)
 # list of mobs contaned all living mobs in game 
-all_mobs_list = [Mob(64+x*16, 64+16*x, Walls, current_Mobs) for x in range(1)]
+all_mobs_list = [Mob(64+x*16, 64+16*x, Walls, current_Mobs, time_object) for x in range(1)]
 
 
 #append current mob for colide detection in current camera position
@@ -234,9 +238,6 @@ while 1:
                 player.LeftAtack()
             if event.key == pygame.K_d:
                 player.RightAtack()
-            if event.key == pygame.K_e:
-                print(pygame.sprite.spritecollideany(player,current_Mobs))
-
 
     isNeeedUpdateLocation = camera.update(player) 
     if isNeeedUpdateLocation or FirstRUN:
@@ -252,19 +253,22 @@ while 1:
     
     
     Walls.draw(screen)
-   
+    time_object.draw(screen)
+    time_object.update()
     screen.blit(player.image, player.rect)
 
     for mob in all_mobs_list:
         if mob.isVisable:
             screen.blit(mob.image, mob.rect)
+    
+    if is_light_on:
+        filter = pygame.surface.Surface((width+100, height+100))
+        filter.fill(pygame.color.Color('Grey'))
+        filter.blit(light, (int(player.x), int(player.y)))
+        screen.blit(filter, (-42, -42), special_flags=pygame.BLEND_RGBA_SUB)
 
-    # filter = pygame.surface.Surface((width+100, height+100))
-    # filter.fill(pygame.color.Color('Grey'))
-    # filter.blit(light, (int(player.x), int(player.y)))
-    # screen.blit(filter, (-42, -42), special_flags=pygame.BLEND_RGBA_SUB)
-    # textsurface = myfont.render("Cam {}, {} Mob: {},{} ".format(camera.cameraPositionX, camera.cameraPositionY, int(all_mobs_list[0].global_position_x), int(all_mobs_list[0].global_position_y)), False, (255, 0, 0))
-    # screen.blit(textsurface,(0,0))
+    textsurface = myfont.render("Cam {}, {} Mob: {},{} ".format(camera.cameraPositionX, camera.cameraPositionY, int(all_mobs_list[0].global_position_x), int(all_mobs_list[0].global_position_y)), False, (255, 0, 0))
+    screen.blit(textsurface,(0,0))
     pygame.display.flip()
     #pygame.display.update()
             
