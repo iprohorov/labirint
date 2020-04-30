@@ -251,7 +251,6 @@ while 1:
         mob.update(player.x, player.y, camera.cameraPositionX, camera.cameraPositionY, size)
     
     
-    
     Walls.draw(screen)
     time_object.draw(screen)
     time_object.update()
@@ -272,8 +271,3 @@ while 1:
     pygame.display.flip()
     #pygame.display.update()
             
-
-
-
-
-

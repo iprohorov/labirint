@@ -108,6 +108,7 @@ class Player (pygame.sprite.Sprite):
         if not (ans is None):
             print("damage")
             ans.GetDamage("Right")
+
     def MoveLeft (self):
         self.currentAnimation = self.leftGoAnimation 
         self.currentAnimation.Start()
@@ -118,11 +119,11 @@ class Player (pygame.sprite.Sprite):
         self.currentAnimation.Start()
         self.x_speed = 0.1
 
-    def MoveUp (self):
+    def MoveUp (self):  
         self.currentAnimation = self.upGoAnimation
         self.currentAnimation.Start()
         self.y_speed = -0.1
-        
+
     def MoveDown (self):
         self.currentAnimation = self.downGoAnimation 
         self.currentAnimation.Start()
@@ -158,11 +159,15 @@ class Mob (pygame.sprite.Sprite):
         self.x_speed = 0
         self.y_speed = 0
     def GetDamage(self, direction):
-        self.time_object.add(TimeObjects.FromHeroText("Test", x = self.rect.x, y =self.rect.y))
-        if direction == "Left":
-            self.global_position_x = self.global_position_x - 5
-        elif direction == "Right":
-            self.global_position_x = self.global_position_x + 5
+        import random 
+        random.seed()
+        shifting = random.randint(1, 16)
+        self.time_object.add(TimeObjects.FromHeroText("-1", x = self.rect.x + shifting, y =self.rect.y - shifting))
+        if len (pygame.sprite.spritecollide(self,self.Walls,False)) == 0:
+            if direction == "Left":
+                self.global_position_x = self.global_position_x - 5
+            elif direction == "Right":
+                self.global_position_x = self.global_position_x + 5
 
     def update(self, player_x_sc, player_y_sc, cameraPositionX, cameraPositionY, size):
         width, height = size
@@ -195,6 +200,7 @@ class Mob (pygame.sprite.Sprite):
             self.state()
         dt = pygame.time.get_ticks() - self.privUpdateTime
         self.privUpdateTime = pygame.time.get_ticks()
+        ### TODO need adding logic for analyze watsprite coliding
         if (len (pygame.sprite.spritecollide(self,self.Walls,False)) > 0): # add mobs
             if self.x_speed > 0:
                 self.x -= 5
@@ -220,16 +226,21 @@ class Mob (pygame.sprite.Sprite):
         self.currentAnimation = self.leftGoAnimation 
         self.currentAnimation.Start()
         self.x_speed = -0.1
-         
+
     def MoveRight (self):
         self.currentAnimation = self.rightGoAnimation 
         self.currentAnimation.Start()
         self.x_speed = 0.1
-        
-    def MoveUp (self):
+
+    def MoveUp (self):  
         self.currentAnimation = self.upGoAnimation
         self.currentAnimation.Start()
         self.y_speed = -0.1
+
+    def MoveDown (self):
+        self.currentAnimation = self.downGoAnimation 
+        self.currentAnimation.Start()
+        self.y_speed = 0.1
 
     def LeftAtack(self):
         self.currentAnimation = self.leftAtackAnimation
@@ -249,19 +260,14 @@ class Mob (pygame.sprite.Sprite):
             print("damage")
             ans.GetDamage("Right")
         
-    def MoveDown (self):
-        self.currentAnimation = self.downGoAnimation 
-        self.currentAnimation.Start()
-        self.y_speed = 0.1
-    
     def Intelect (self): #return NextState
-        if (self.player_x_sc - self.x > 32):
+        if (self.player_x_sc - self.x > 16):
             return self.MoveRight
-        elif (self.player_x_sc - self.x < -32):
+        elif (self.player_x_sc - self.x < -16):
              return self.StopMoving
-        elif (self.player_y_sc - self.y > 32):
+        elif (self.player_y_sc - self.y > 16):
             return self.MoveDown
-        elif (self.player_y_sc - self.y < -32):
+        elif (self.player_y_sc - self.y < -16):
             return self.MoveUp
         else:
             return self.StopMoving
