@@ -18,9 +18,11 @@ for layer in tiled_map.visible_layers:
     print(layer)
     if isinstance(layer, TiledTileLayer):
         print("TiledTileLayer")
-        print(TiledMap.get_tile_properties(0, 0, layer))
+        # print(TiledMap.get_tile_properties(0, 0, layer))
         for t in layer.iter_data():
-            print(t)
+            if (t[2] != 0):
+                print(tiled_map.get_tile_properties_by_gid(t[2]))
+                print(t)
     elif isinstance(layer, TiledObjectGroup):
         print("TiledObjectGroup")
     elif isinstance(layer, TiledImageLayer):
