@@ -9,7 +9,7 @@ def LoadImageList (fileNamesList):
     return imageList
 
 class Animation:
-    def __init__ (self,framesFiles, frameTime, flipX = False, flipY = False, shot_animation = True):
+    def __init__ (self,framesFiles, frameTime, flipX = False, flipY = False, shot_animation = False):
         self.frames = LoadImageList (framesFiles)
         self.lastUpdateAnimationTime = 0
         self.currentFrame = 0
@@ -109,25 +109,35 @@ class Player (pygame.sprite.Sprite):
             print("damage")
             ans.GetDamage("Right")
 
+    def _SetUpMoving(self, animation, speed, direction):
+        if self.currentAnimation != animation:
+            print("Wrong")
+            self.currentAnimation =  animation
+            self.currentAnimation.Start()
+            if (direction == "x"):
+                self.x_speed = speed
+            else:
+                self.y_speed = speed
+        elif(self.currentAnimation == animation) and (not self.currentAnimation.isPlay):
+            print("Start")
+            self.currentAnimation.Start()
+            if (direction == "x"):
+                self.x_speed = speed
+            else:
+                self.y_speed = speed
+
+
     def MoveLeft (self):
-        self.currentAnimation = self.leftGoAnimation 
-        self.currentAnimation.Start()
-        self.x_speed = -0.1
+        self._SetUpMoving(self.leftGoAnimation, -0.1, "x")
 
     def MoveRight (self):
-        self.currentAnimation = self.rightGoAnimation 
-        self.currentAnimation.Start()
-        self.x_speed = 0.1
+        self._SetUpMoving(self.rightGoAnimation, 0.1, "x")
 
-    def MoveUp (self):  
-        self.currentAnimation = self.upGoAnimation
-        self.currentAnimation.Start()
-        self.y_speed = -0.1
+    def MoveUp (self):
+        self._SetUpMoving(self.upGoAnimation, -0.1, "y")  
 
     def MoveDown (self):
-        self.currentAnimation = self.downGoAnimation 
-        self.currentAnimation.Start()
-        self.y_speed = 0.1
+        self._SetUpMoving(self.downGoAnimation, 0.1, "y")
 
 class Mob (pygame.sprite.Sprite):
     def __init__ (self, x_start_global, y_start_global, Walls, current_Mobs, time_object, cameraPositionX = 0, cameraPositionY = 0):
@@ -222,25 +232,34 @@ class Mob (pygame.sprite.Sprite):
         self.global_position_y = cameraPositionY*16+ self.y 
         return True 
 
+    def _SetUpMoving(self, animation, speed, direction):
+        if self.currentAnimation != animation:
+            print("Wrong")
+            self.currentAnimation =  animation
+            self.currentAnimation.Start()
+            if (direction == "x"):
+                self.x_speed = speed
+            else:
+                self.y_speed = speed
+        elif(self.currentAnimation == animation) and (not self.currentAnimation.isPlay):
+            print("Start")
+            self.currentAnimation.Start()
+            if (direction == "x"):
+                self.x_speed = speed
+            else:
+                self.y_speed = speed
+
     def MoveLeft (self):
-        self.currentAnimation = self.leftGoAnimation 
-        self.currentAnimation.Start()
-        self.x_speed = -0.1
+        self._SetUpMoving(self.leftGoAnimation, -0.1, "x")
 
     def MoveRight (self):
-        self.currentAnimation = self.rightGoAnimation 
-        self.currentAnimation.Start()
-        self.x_speed = 0.1
+        self._SetUpMoving(self.rightGoAnimation, 0.1, "x")
 
-    def MoveUp (self):  
-        self.currentAnimation = self.upGoAnimation
-        self.currentAnimation.Start()
-        self.y_speed = -0.1
+    def MoveUp (self):
+        self._SetUpMoving(self.upGoAnimation, -0.1, "y")  
 
     def MoveDown (self):
-        self.currentAnimation = self.downGoAnimation 
-        self.currentAnimation.Start()
-        self.y_speed = 0.1
+        self._SetUpMoving(self.downGoAnimation, 0.1, "y")
 
     def LeftAtack(self):
         self.currentAnimation = self.leftAtackAnimation
