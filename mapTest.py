@@ -22,6 +22,7 @@ for layer in tiled_map.visible_layers:
         for t in layer.iter_data():
             if (t[2] != 0):
                 print(tiled_map.get_tile_properties_by_gid(t[2]))
+                screen.blit(tiled_map.get_tile_image_by_gid(t[2]), (t[0]*16, t[1]*16))
                 print(t)
     elif isinstance(layer, TiledObjectGroup):
         print("TiledObjectGroup")
@@ -30,5 +31,5 @@ for layer in tiled_map.visible_layers:
 
 pygame.display.flip()
 
-# while True:
-#     pass
+while True:
+    pass

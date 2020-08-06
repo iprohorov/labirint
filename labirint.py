@@ -56,33 +56,6 @@ class Camera :
 
         if self.cameraShiftX > defaultShift:
             self.cameraShiftX = defaultShift
-    
-    def handle_mod_position_left(self, mob):
-        """ Return del mob or no
-        """
-        mob.x -= self.cameraShiftX*16
-
-    def handle_mod_position_right(self, mob):
-        """ Return del mob or no
-        """
-        mob.x += self.cameraShiftX*16
-
-    def handle_mod_position_up(self, mob):
-        pass 
-
-    def handle_mod_position_down(self, mob):
-        pass
-
-    def update_mobs_position(self, mobs_list, direction):
-        if (mobs_list is None) or mobs_list == []:
-            print ("no mobs")
-            return None
-        if direction == "Left":
-            for mob in mobs_list:
-                self.handle_mod_position_left(mob)
-        if direction == "Right":
-            for mob in mobs_list:
-                self.handle_mod_position_right(mob)
 
     def update(self, player): # if croossing  position update camera
         
@@ -200,6 +173,7 @@ def DrawMAP (camera):
     
     for x in range (camera.cameraPositionX,fullScreenSizeX):
         for y in range (camera.cameraPositionY,fullScreenSizeY):
+            #Wals is static object 
             if (wallMap[y][x]):
                 Walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16))
 
