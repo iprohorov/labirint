@@ -125,6 +125,7 @@ privCameraPositionY = 0
 
 
 Walls = pygame.sprite.Group()
+#display mobs using for colide detected 
 current_Mobs = pygame.sprite.Group()
 time_object = pygame.sprite.Group()
 
@@ -222,7 +223,7 @@ while 1:
     player.update(Walls, camera.cameraPositionX, camera.cameraPositionY)
 
     for mob in all_mobs_list:
-        mob.update(player.x, player.y, camera.cameraPositionX, camera.cameraPositionY, size)
+        mob.update(player, camera.cameraPositionX, camera.cameraPositionY, size)
     
     
     Walls.draw(screen)

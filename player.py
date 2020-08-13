@@ -139,6 +139,17 @@ class Player (pygame.sprite.Sprite):
     def MoveDown (self):
         self._SetUpMoving(self.downGoAnimation, 0.1, "y")
 
+    def GetDamage(self, direction):
+        import random 
+        random.seed()
+        shifting = random.randint(1, 16)
+        self.time_object.add(TimeObjects.FromHeroText("-1", x = self.rect.x + shifting, y =self.rect.y - shifting))
+        if len (pygame.sprite.spritecollide(self,self.Walls,False)) == 0:
+            if direction == "Left":
+                self.global_position_x = self.global_position_x - 5
+            elif direction == "Right":
+                self.global_position_x = self.global_position_x + 5
+
 class Mob (pygame.sprite.Sprite):
     def __init__ (self, x_start_global, y_start_global, Walls, current_Mobs, time_object, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
@@ -179,8 +190,10 @@ class Mob (pygame.sprite.Sprite):
             elif direction == "Right":
                 self.global_position_x = self.global_position_x + 5
 
-    def update(self, player_x_sc, player_y_sc, cameraPositionX, cameraPositionY, size):
+    def update(self, player, cameraPositionX, cameraPositionY, size):
         width, height = size
+        self.player = player
+
         if not self.isVisable:
             if (cameraPositionX*16 < (self.global_position_x) <  cameraPositionX*16+width) and (cameraPositionY*16 < (self.global_position_y) <  cameraPositionY*16+height):
                 self.isVisable = True
@@ -197,9 +210,9 @@ class Mob (pygame.sprite.Sprite):
             self.kill()
             return -1 
         else:
+            pass
             self.current_Mobs.add(self)
-        self.player_x_sc = player_x_sc
-        self.player_y_sc = player_y_sc
+
         self.x = self.global_position_x - cameraPositionX*16
         self.y = self.global_position_y - cameraPositionY*16
 
@@ -280,13 +293,15 @@ class Mob (pygame.sprite.Sprite):
             ans.GetDamage("Right")
         
     def Intelect (self): #return NextState
-        if (self.player_x_sc - self.x > 16):
+        if ((self.player.x - self.y >= -16) and (self.player.x - self.y <= 0)):
+            return self.LeftAtack
+        if (self.player.x - self.x > 16):
             return self.MoveRight
-        elif (self.player_x_sc - self.x < -16):
-             return self.StopMoving
-        elif (self.player_y_sc - self.y > 16):
+        elif (self.player.x - self.x < -16):
+            return self.MoveLeft
+        elif (self.player.x - self.y > 16):
             return self.MoveDown
-        elif (self.player_y_sc - self.y < -16):
+        elif (self.player.x - self.y < -16):
             return self.MoveUp
         else:
             return self.StopMoving
