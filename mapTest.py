@@ -28,5 +28,5 @@ print(tiled_map.get_tile_properties_by_gid(1))
 
 # pygame.display.flip()
 
-# while True:
-#     pass
+while True:
+    pass
