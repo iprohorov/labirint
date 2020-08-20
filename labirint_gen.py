@@ -1,5 +1,10 @@
 import sys
 from random import randint
+import pytmx
+from pytmx import TiledImageLayer
+from pytmx import TiledObjectGroup
+from pytmx import TiledTileLayer
+from pytmx import TiledMap
 LABYRINTH_SIZE_X = 10
 LABYRINTH_SIZE_Y = 10
 
@@ -148,21 +153,59 @@ class Labyrinth ():
             for line in lines:
                 sys.stdout.write(line+"\r\n")
 
-    def _drawDownwall (self, x, y):
+    def _drawDownwall (self, x, y, id=1):
         for i in range (self.scaleX):
-            self.wallMap[x*self.scaleY+(self.scaleY-1)][y*self.scaleX+i] = 1
+            self.wallMap[x*self.scaleY+(self.scaleY-1)][y*self.scaleX+i] = id
     
-    def _drawUpwall (self, x, y):
+    def _drawUpwall (self, x, y, id=1):
         for i in range (self.scaleX):
-            self.wallMap[x*self.scaleY][y*self.scaleX+i] = 1
+            self.wallMap[x*self.scaleY][y*self.scaleX+i] = id
     
-    def _drawLeftwall (self, x, y):
+    def _drawLeftwall (self, x, y, id=1):
         for i in range (self.scaleY):
-            self.wallMap[x*self.scaleY+i][y*self.scaleX] = 1
+            self.wallMap[x*self.scaleY+i][y*self.scaleX] = id
     
-    def _drawRightwall (self, x, y):
+    def _drawRightwall (self, x, y, id=1):
         for i in range (self.scaleY):
-            self.wallMap[x*self.scaleY+i][y*self.scaleX + (self.scaleX-1)] = 1
+            self.wallMap[x*self.scaleY+i][y*self.scaleX + (self.scaleX-1)] = id
+
+    def drawRoom(self, x, y):
+        tiled_map = pytmx.load_pygame('image\\Tilemap\\t1.tmx')
+        for layer in tiled_map.visible_layers:
+            if isinstance(layer, TiledTileLayer):
+                # t[0]-x  t[1]-y t[2]-gid
+                for t in layer.iter_data():
+                    if (t[2] != 0):
+                        self.wallMap[x*self.scaleX+t[0]][y*self.scaleY-+t[1]] = t[2]
+
+    def drawUseTMX(self):
+        self.scaleX = 16
+        self.scaleY = 16
+        
+        self.wallMap = [[ 0 for x in range(self.sizeX*self.scaleY)] for y in range(self.sizeY*self.scaleX)]
+
+        for x in range (self.sizeY): # y == x normal
+            for y in range (self.sizeX):
+                self.drawRoom(x, y)
+                if x == 0:
+                    self._drawUpwall(x,y,id=554)
+                    if self.labyrinth[y][x].wall[3]:
+                        self._drawDownwall(x,y)
+                elif x == self.sizeX-1:
+                    self._drawDownwall(x,y,id=554)
+                else:
+                    if self.labyrinth[y][x].wall[3]:
+                        self._drawDownwall(x,y,id=554)
+                if y == 0:
+                    self._drawLeftwall(x,y)
+                    if self.labyrinth[y][x].wall[2]:
+                        self._drawRightwall(x,y,id=554)
+                elif y == self.sizeY-1:
+                    self._drawRightwall(x,y,id=554)
+                else:
+                    if self.labyrinth[y][x].wall[2]:
+                        self._drawRightwall(x,y,id=554)
+        return (self.wallMap.copy(), self.sizeX*self.scaleX, self.sizeY*self.scaleY) # first y second Y
     
     def draw (self):
         self.scaleX = 8
@@ -191,3 +234,4 @@ class Labyrinth ():
                     if self.labyrinth[y][x].wall[2]:
                         self._drawRightwall(x,y)
         return (self.wallMap.copy(), self.sizeX*self.scaleX, self.sizeY*self.scaleY) # first y second Y
+

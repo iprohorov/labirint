@@ -2,13 +2,18 @@
 import pygame
 import labirint_gen
 import TimeObjects
+import pytmx
 from player import Player
 from player import Mob
 
+
 class Wall (pygame.sprite.Sprite): 
-    def __init__ (self, X=0, Y=0):
+    def __init__ (self, X=0, Y=0, image = None):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("wall.png").convert_alpha()
+        if (image is None):
+            self.image = pygame.image.load("wall.png").convert_alpha()
+        else:
+            self.image = image
         self.rect = self.image.get_rect(center=(X,Y))
     def clear_callback(surf, rect):
         color = 0, 0, 0
@@ -114,7 +119,8 @@ backcolor = 71, 45, 60
 screen = pygame.display.set_mode(size)
 location = labirint_gen.Labyrinth(50,50) #50 50
 location.dbgPrint()
-wallMap, locationSizeX, locationSizeY = location.draw()
+# wallMap, locationSizeX, locationSizeY = location.draw()
+wallMap, locationSizeX, locationSizeY = location.drawUseTMX()
 camera = Camera(size, locationSizeX, locationSizeY)
 
 cameraPositionX = 0
@@ -143,6 +149,7 @@ light=pygame.image.load('light.png')
 pygame.font.init()
 myfont = pygame.font.SysFont('Aria', 24)
 
+tiled_map = pytmx.load_pygame('image\\Tilemap\\t1.tmx')
 
 
 def DrawMAP (camera):
@@ -176,7 +183,7 @@ def DrawMAP (camera):
         for y in range (camera.cameraPositionY,fullScreenSizeY):
             #Wals is static object 
             if (wallMap[y][x]):
-                Walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16))
+                Walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = tiled_map.get_tile_image_by_gid(wallMap[y][x])))
 
 
     return True

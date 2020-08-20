@@ -210,7 +210,6 @@ class Mob (pygame.sprite.Sprite):
             self.kill()
             return -1 
         else:
-            pass
             self.current_Mobs.add(self)
 
         self.x = self.global_position_x - cameraPositionX*16
