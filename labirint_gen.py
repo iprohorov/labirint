@@ -188,23 +188,23 @@ class Labyrinth ():
             for y in range (self.sizeX):
                 self.drawRoom(x, y)
                 if x == 0:
-                    self._drawUpwall(x,y,id=554)
+                    self._drawUpwall(x,y)
                     if self.labyrinth[y][x].wall[3]:
                         self._drawDownwall(x,y)
                 elif x == self.sizeX-1:
-                    self._drawDownwall(x,y,id=554)
+                    self._drawDownwall(x,y)
                 else:
                     if self.labyrinth[y][x].wall[3]:
-                        self._drawDownwall(x,y,id=554)
+                        self._drawDownwall(x,y)
                 if y == 0:
                     self._drawLeftwall(x,y)
                     if self.labyrinth[y][x].wall[2]:
-                        self._drawRightwall(x,y,id=554)
+                        self._drawRightwall(x,y)
                 elif y == self.sizeY-1:
-                    self._drawRightwall(x,y,id=554)
+                    self._drawRightwall(x,y)
                 else:
                     if self.labyrinth[y][x].wall[2]:
-                        self._drawRightwall(x,y,id=554)
+                        self._drawRightwall(x,y)
         return (self.wallMap.copy(), self.sizeX*self.scaleX, self.sizeY*self.scaleY) # first y second Y
     
     def draw (self):
