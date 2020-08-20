@@ -155,38 +155,38 @@ class Labyrinth ():
 
     def _drawDownwall (self, x, y, id=1):
         for i in range (self.scaleX):
-            self.wallMap[x*self.scaleY+(self.scaleY-1)][y*self.scaleX+i] = id
+            self.wallMap[x*self.scaleY+(self.scaleY-1)][y*self.scaleX+i] = (0,0)
     
     def _drawUpwall (self, x, y, id=1):
         for i in range (self.scaleX):
-            self.wallMap[x*self.scaleY][y*self.scaleX+i] = id
+            self.wallMap[x*self.scaleY][y*self.scaleX+i] = (0,0)
     
     def _drawLeftwall (self, x, y, id=1):
         for i in range (self.scaleY):
-            self.wallMap[x*self.scaleY+i][y*self.scaleX] = id
+            self.wallMap[x*self.scaleY+i][y*self.scaleX] = (0,0)
     
     def _drawRightwall (self, x, y, id=1):
         for i in range (self.scaleY):
-            self.wallMap[x*self.scaleY+i][y*self.scaleX + (self.scaleX-1)] = id
+            self.wallMap[x*self.scaleY+i][y*self.scaleX + (self.scaleX-1)] = (0,0)
 
-    def drawRoom(self, x, y):
-        tiled_map = pytmx.load_pygame('image\\Tilemap\\t1.tmx')
+    def drawRoom(self, x, y, location_pieces):
+        pieces = randint(1, len(location_pieces)-1)
+        tiled_map = location_pieces[pieces]
         for layer in tiled_map.visible_layers:
             if isinstance(layer, TiledTileLayer):
                 # t[0]-x  t[1]-y t[2]-gid
                 for t in layer.iter_data():
                     if (t[2] != 0):
-                        self.wallMap[x*self.scaleX+t[0]][y*self.scaleY-+t[1]] = t[2]
+                        self.wallMap[x*self.scaleX+t[0]][y*self.scaleY+t[1]] = (pieces, t[2])
 
-    def drawUseTMX(self):
+    def drawUseTMX(self, location_pieces):
         self.scaleX = 16
         self.scaleY = 16
-        
-        self.wallMap = [[ 0 for x in range(self.sizeX*self.scaleY)] for y in range(self.sizeY*self.scaleX)]
+        self.wallMap = [[ None for x in range(self.sizeX*self.scaleY)] for y in range(self.sizeY*self.scaleX)]
 
         for x in range (self.sizeY): # y == x normal
             for y in range (self.sizeX):
-                self.drawRoom(x, y)
+                self.drawRoom(x, y, location_pieces)
                 if x == 0:
                     self._drawUpwall(x,y)
                     if self.labyrinth[y][x].wall[3]:

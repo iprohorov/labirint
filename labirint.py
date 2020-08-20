@@ -117,10 +117,8 @@ class Game:
     game_map = None
     locationSizeX = None
     locationSizeY = None
-    tiled_map = None
+    location_pieces = None
     def __init__ (self):
-        # tiled rooms 
-        Game.tiled_map = pytmx.load_pygame('image\\Tilemap\\t1.tmx')
         #group consist static solid object
         Game.walls = pygame.sprite.Group()
         #display mobs using for colide detected 
@@ -130,10 +128,15 @@ class Game:
         #generate map
         location = labirint_gen.Labyrinth(50,50)
         location.dbgPrint()
-        Game.game_map, Game.locationSizeX, Game.locationSizeY = location.draw()
+        #load tmx map for room
+        Game.location_pieces = self.load_location_piece()
+        Game.game_map, Game.locationSizeX, Game.locationSizeY = location.drawUseTMX(Game.location_pieces)
         print(f"MAP:{Game.locationSizeX},{Game.locationSizeY}")
-
-        
+    def load_location_piece(self):
+        location_pieces = {0:pytmx.load_pygame('image\\Tilemap\\t0.tmx'), 
+                           1:pytmx.load_pygame('image\\Tilemap\\t1.tmx'),
+                           2:pytmx.load_pygame('image\\Tilemap\\t2.tmx')}
+        return location_pieces
 
 def DrawMAP (camera):
     # clean map 
@@ -152,8 +155,8 @@ def DrawMAP (camera):
     for x in range (camera.cameraPositionX,fullScreenSizeX):
         for y in range (camera.cameraPositionY,fullScreenSizeY):
             #Wals is static object 
-            if (Game.game_map[y][x]):
-                 Game.walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = Game.tiled_map.get_tile_image_by_gid(Game.game_map[y][x])))
+            if (not(Game.game_map[y][x] is None)):
+                 Game.walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = Game.location_pieces[Game.game_map[y][x][0]].get_tile_image_by_gid(Game.game_map[y][x][1])))
     return True
 
 def main ():
