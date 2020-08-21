@@ -5,6 +5,7 @@ import TimeObjects
 import pytmx
 from player import Player
 from player import Mob
+import pygame_gui
 
 
 class Wall (pygame.sprite.Sprite): 
@@ -162,6 +163,10 @@ def DrawMAP (camera):
 def main ():
     pygame.init()
     screen = pygame.display.set_mode(Game.screen_setting["size"])
+    manager = pygame_gui.UIManager(Game.screen_setting["size"])
+    hello_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350, 275), (100, 50)),
+                                             text='Say Hello',
+                                             manager=manager)
     game = Game()
     camera = Camera(Game.screen_setting["size"], Game.locationSizeX, Game.locationSizeY)
     player = Player(Game.current_mobs)
@@ -179,8 +184,10 @@ def main ():
 
     isNeeedUpdateLocation = True
     FirstRUN = True
+    clock = pygame.time.Clock()
 
     while 1:
+        time_delta = clock.tick(60)/1000.0
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
@@ -206,7 +213,14 @@ def main ():
                     player.LeftAtack()
                 if event.key == pygame.K_d:
                     player.RightAtack()
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == hello_button:
+                        hello_button.disable()
+                        print('Hello World!')
+            manager.process_events(event)
 
+        manager.update(time_delta)
         isNeeedUpdateLocation = camera.update(player) 
         if isNeeedUpdateLocation or FirstRUN:
             FirstRUN = False
@@ -236,6 +250,7 @@ def main ():
 
         textsurface = myfont.render("Cam {}, {} Mob: {},{} ".format(camera.cameraPositionX, camera.cameraPositionY, int(all_mobs_list[0].global_position_x), int(all_mobs_list[0].global_position_y)), False, (255, 0, 0))
         screen.blit(textsurface,(0,0))
+        manager.draw_ui(screen)
         pygame.display.flip()
         #pygame.display.update()
 
