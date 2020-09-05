@@ -1,5 +1,6 @@
 import pygame
 import TimeObjects
+import math
 import pygame.transform
 
 def LoadImageList (fileNamesList):
@@ -62,6 +63,7 @@ class Player (pygame.sprite.Sprite):
         self.global_position_x = cameraPositionX+ int(self.x)
         self.global_position_y = cameraPositionY+ int(self.y)
         self.current_Mobs = current_Mobs
+        self.mov_module = MovingModule()
 
     def StopMoving(self):
         self.currentAnimation.Stop()
@@ -70,22 +72,23 @@ class Player (pygame.sprite.Sprite):
     def update(self, Walls, cameraPositionX, cameraPositionY):
         self.global_position_x = cameraPositionX+ int(self.x)
         self.global_position_y = cameraPositionY+ int(self.y)
+        self.mov_module.update(self.x, self.y, self, Walls)
+        # dt = pygame.time.get_ticks() - self.privUpdateTime
+        # self.privUpdateTime = pygame.time.get_ticks()
+        # if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
+        #     if self.x_speed > 0:
+        #         self.x -= 1
+        #     elif self.x_speed < 0:
+        #         self.x += 1
+        #     if self.y_speed > 0:
+        #         self.y -= 1
+        #     elif self.y_speed < 0:
+        #         self.y += 1
+        #     self.StopMoving()
+        # else:
+        #     self.x += dt*self.x_speed
+        #     self.y += dt*self.y_speed
 
-        dt = pygame.time.get_ticks() - self.privUpdateTime
-        self.privUpdateTime = pygame.time.get_ticks()
-        if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
-            if self.x_speed > 0:
-                self.x -= 1
-            elif self.x_speed < 0:
-                self.x += 1
-            if self.y_speed > 0:
-                self.y -= 1
-            elif self.y_speed < 0:
-                self.y += 1
-            self.StopMoving()
-        else:
-            self.x += dt*self.x_speed
-            self.y += dt*self.y_speed
         self.image = self.currentAnimation.getImg()
         self.rect.topleft = (int(self.x), int(self.y))
 
@@ -305,5 +308,36 @@ class Mob (pygame.sprite.Sprite):
         else:
             return self.StopMoving
         
+class MovingModule:
+    def __init__(self):
+        self.v_x = 0
+        self.v_y = 0
+        self.a_x = 0
+        self.a_y = 0
+        self.m = 0
+        self.priv_t = pygame.time.get_ticks()
+    def update(self, x, y, sprite, walls):
+        dt = pygame.time.get_ticks() - self.priv_t
+        priv_t = pygame.time.get_ticks()
+        collided_object = pygame.sprite.spritecollideany(sprite, walls)
+        # added recursion for checking all collided object 
+        if collided_object is not None:
+            obj = collided_object
+            obj_x, obj_y = obj.topleft 
+            dx = int(x)-obj_x
+            dy = int(y)-obj_y
+            sheeft_x = math.copysign((16 - math.fabs(dx))+1, dx)
+            sheeft_y = math.copysign((16 - math.fabs(dy))+1, dy)
+            x = x + sheeft_x
+            y = y + sheeft_y
+        x += dt*v_x
+        y += dt*v_y
+        return x, y      
+
+
+
+
+        
+
 
         
