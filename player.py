@@ -43,7 +43,7 @@ class Animation:
     # add animation complete add time of animation 
         
 class Player (pygame.sprite.Sprite):
-    def __init__ (self, current_Mobs, X=32, Y=32, cameraPositionX = 0, cameraPositionY = 0):
+    def __init__ (self, current_Mobs, X=40, Y=48, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
         self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
         self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
@@ -67,12 +67,11 @@ class Player (pygame.sprite.Sprite):
 
     def StopMoving(self):
         self.currentAnimation.Stop()
-        self.x_speed = 0
-        self.y_speed = 0 
+        self.mov_module.move_stop()
     def update(self, Walls, cameraPositionX, cameraPositionY):
         self.global_position_x = cameraPositionX+ int(self.x)
         self.global_position_y = cameraPositionY+ int(self.y)
-        self.mov_module.update(self.x, self.y, self, Walls)
+        self.x, self.y = self.mov_module.update(self.x, self.y, self, Walls)
         # dt = pygame.time.get_ticks() - self.privUpdateTime
         # self.privUpdateTime = pygame.time.get_ticks()
         # if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
@@ -132,15 +131,19 @@ class Player (pygame.sprite.Sprite):
 
     def MoveLeft (self):
         self._SetUpMoving(self.leftGoAnimation, -0.1, "x")
+        self.mov_module.move_left()
 
     def MoveRight (self):
         self._SetUpMoving(self.rightGoAnimation, 0.1, "x")
+        self.mov_module.move_right()
 
     def MoveUp (self):
-        self._SetUpMoving(self.upGoAnimation, -0.1, "y")  
+        self._SetUpMoving(self.upGoAnimation, -0.1, "y")
+        self.mov_module.move_up()  
 
     def MoveDown (self):
         self._SetUpMoving(self.downGoAnimation, 0.1, "y")
+        self.mov_module.move_down()
 
     def GetDamage(self, direction):
         import random 
@@ -315,23 +318,43 @@ class MovingModule:
         self.a_x = 0
         self.a_y = 0
         self.m = 0
+        self.p_x = 0
+        self.p_y = 0
         self.priv_t = pygame.time.get_ticks()
+    def move_left(self):
+        self.v_x = -0.00001
+    def move_right(self):
+        self.v_x = 0.00001
+    def move_up(self):
+        self.v_y = -0.00001
+    def move_down(self):
+        self.v_y = 0.00001
+    def move_stop(self):
+        self.v_x = 0
+        self.v_y = 0 
     def update(self, x, y, sprite, walls):
         dt = pygame.time.get_ticks() - self.priv_t
-        priv_t = pygame.time.get_ticks()
+        priv_t = pygame.time.get_ticks()    
         collided_object = pygame.sprite.spritecollideany(sprite, walls)
         # added recursion for checking all collided object 
+
         if collided_object is not None:
             obj = collided_object
-            obj_x, obj_y = obj.topleft 
-            dx = int(x)-obj_x
-            dy = int(y)-obj_y
+            dx = int(x)-obj.rect.x
+            dy = int(y)-obj.rect.y
+            print("colide {} {}".format(dx, dy))
             sheeft_x = math.copysign((16 - math.fabs(dx))+1, dx)
             sheeft_y = math.copysign((16 - math.fabs(dy))+1, dy)
-            x = x + sheeft_x
-            y = y + sheeft_y
-        x += dt*v_x
-        y += dt*v_y
+            if (self.v_x != 0):
+                x = x + sheeft_x
+            if (self.v_y != 0):
+                y = y + sheeft_y
+            self.v_x = 0
+            self.v_y = 0
+        x += dt*self.v_x
+        y += dt*self.v_y
+        self.p_x = x
+        self.p_y = y 
         return x, y      
 
 
