@@ -72,22 +72,6 @@ class Player (pygame.sprite.Sprite):
         self.global_position_x = cameraPositionX+ int(self.x)
         self.global_position_y = cameraPositionY+ int(self.y)
         self.x, self.y = self.mov_module.update(self.x, self.y, self, Walls)
-        # dt = pygame.time.get_ticks() - self.privUpdateTime
-        # self.privUpdateTime = pygame.time.get_ticks()
-        # if (len (pygame.sprite.spritecollide(self,Walls,False)) > 0):
-        #     if self.x_speed > 0:
-        #         self.x -= 1
-        #     elif self.x_speed < 0:
-        #         self.x += 1
-        #     if self.y_speed > 0:
-        #         self.y -= 1
-        #     elif self.y_speed < 0:
-        #         self.y += 1
-        #     self.StopMoving()
-        # else:
-        #     self.x += dt*self.x_speed
-        #     self.y += dt*self.y_speed
-
         self.image = self.currentAnimation.getImg()
         self.rect.topleft = (int(self.x), int(self.y))
 
@@ -127,7 +111,6 @@ class Player (pygame.sprite.Sprite):
                 self.x_speed = speed
             else:
                 self.y_speed = speed
-
 
     def MoveLeft (self):
         self._SetUpMoving(self.leftGoAnimation, -0.1, "x")
@@ -180,11 +163,13 @@ class Mob (pygame.sprite.Sprite):
         self.state = None
         self.global_position_x = x_start_global
         self.global_position_y = y_start_global
-        
+        self.mov_module = MovingModule()
+
     def StopMoving(self):
         self.currentAnimation.Stop()
         self.x_speed = 0
         self.y_speed = 0
+        self.mov_module.move_stop()                                                             
     def GetDamage(self, direction):
         import random 
         random.seed()
@@ -196,7 +181,7 @@ class Mob (pygame.sprite.Sprite):
             elif direction == "Right":
                 self.global_position_x = self.global_position_x + 5
 
-    def update(self, player, cameraPositionX, cameraPositionY, size):
+    def update(self, Walls, player, cameraPositionX, cameraPositionY, size):
         width, height = size
         self.player = player
 
@@ -211,7 +196,7 @@ class Mob (pygame.sprite.Sprite):
                 self.isVisable = False 
             if (self.global_position_y < cameraPositionY*16) or (self.global_position_y > cameraPositionY*16+height):
                 self.isVisable = False 
-
+        
         if not self.isVisable:
             self.kill()
             return -1 
@@ -220,32 +205,33 @@ class Mob (pygame.sprite.Sprite):
 
         self.x = self.global_position_x - cameraPositionX*16
         self.y = self.global_position_y - cameraPositionY*16
-
+        
         next_state = self.Intelect()
         if ((self.state is None) or (self.state != next_state)):
             print("Mob")
             self.state = next_state
             self.state()
-        dt = pygame.time.get_ticks() - self.privUpdateTime
-        self.privUpdateTime = pygame.time.get_ticks()
-        ### TODO need adding logic for analyze watsprite coliding
-        if (len (pygame.sprite.spritecollide(self,self.Walls,False)) > 0): # add mobs
-            if self.x_speed > 0:
-                self.x -= 5
-            elif self.x_speed < 0:
-                self.x += 5
-            if self.y_speed > 0:
-                self.y -= 5
-            elif self.y_speed < 0:
-                self.y += 5
-            self.StopMoving()
-        else:
-            self.x += dt*self.x_speed
-            self.y += dt*self.y_speed
+        # dt = pygame.time.get_ticks() - self.privUpdateTime
+        # self.privUpdateTime = pygame.time.get_ticks()
+        # ### TODO need adding logic for analyze watsprite coliding
+        # if (len (pygame.sprite.spritecollide(self,self.Walls,False)) > 0): # add mobs
+        #     if self.x_speed > 0:
+        #         self.x -= 5
+        #     elif self.x_speed < 0:
+        #         self.x += 5
+        #     if self.y_speed > 0:
+        #         self.y -= 5
+        #     elif self.y_speed < 0:
+        #         self.y += 5
+        #     self.StopMoving()
+        # else:
+        #     self.x += dt*self.x_speed
+        #     self.y += dt*self.y_speed
+        self.x, self.y = self.mov_module.update(self.x, self.y, self, Walls)
         self.image = self.currentAnimation.getImg()
         self.rect.x = self.x
         self.rect.y = self.y
-
+        #self.x, self.y = self.mov_module.update(self.x, self.y, self, Walls)
         self.global_position_x = cameraPositionX*16+ self.x
         self.global_position_y = cameraPositionY*16+ self.y 
         return True 
@@ -269,15 +255,19 @@ class Mob (pygame.sprite.Sprite):
 
     def MoveLeft (self):
         self._SetUpMoving(self.leftGoAnimation, -0.1, "x")
+        self.mov_module.move_left()
 
     def MoveRight (self):
         self._SetUpMoving(self.rightGoAnimation, 0.1, "x")
+        self.mov_module.move_right()
 
     def MoveUp (self):
-        self._SetUpMoving(self.upGoAnimation, -0.1, "y")  
+        self._SetUpMoving(self.upGoAnimation, -0.1, "y")
+        self.mov_module.move_up()  
 
     def MoveDown (self):
         self._SetUpMoving(self.downGoAnimation, 0.1, "y")
+        self.mov_module.move_down()
 
     def LeftAtack(self):
         self.currentAnimation = self.leftAtackAnimation
@@ -342,9 +332,11 @@ class MovingModule:
             obj = collided_object
             dx = int(x)-obj.rect.x
             dy = int(y)-obj.rect.y
+
+ 
             print("colide {} {}".format(dx, dy))
-            sheeft_x = math.copysign((16 - math.fabs(dx))+1, dx)
-            sheeft_y = math.copysign((16 - math.fabs(dy))+1, dy)
+            sheeft_x = math.copysign((16 - math.fabs(dx)), dx)
+            sheeft_y = math.copysign((16 - math.fabs(dy)), dy)
             if (self.v_x != 0):
                 x = x + sheeft_x
             if (self.v_y != 0):

@@ -166,7 +166,7 @@ def main ():
     camera = Camera(Game.screen_setting["size"], Game.locationSizeX, Game.locationSizeY)
     player = Player(Game.current_mobs)
     # list of mobs contaned all living mobs in game 
-    all_mobs_list = [Mob(64+x*16, 64+16*x, Game.walls, Game.current_mobs, Game.time_object) for x in range(1)]
+    all_mobs_list = [Mob(100+x*16, 100+16*x, Game.walls, Game.current_mobs, Game.time_object) for x in range(1)]
     #append current mob for colide detection in current camera position
     for mob in all_mobs_list:
         Game.current_mobs.add(mob)
@@ -212,11 +212,12 @@ def main ():
             FirstRUN = False
             DrawMAP(camera)
         
-        screen.fill(Game.screen_setting["backcolor"])    
+        screen.fill(Game.screen_setting["backcolor"])
+        
         player.update(Game.walls, camera.cameraPositionX, camera.cameraPositionY)
 
         for mob in all_mobs_list:
-            mob.update(player, camera.cameraPositionX, camera.cameraPositionY, Game.screen_setting["size"])
+            mob.update(Game.walls, player, camera.cameraPositionX, camera.cameraPositionY, Game.screen_setting["size"])
         
         
         Game.walls.draw(screen)
