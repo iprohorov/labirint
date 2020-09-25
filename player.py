@@ -303,6 +303,7 @@ class Mob (pygame.sprite.Sprite):
         
 class MovingModule:
     def __init__(self):
+        self.fps = 60
         self.v_x = 0
         self.v_y = 0
         self.a_x = 0
@@ -312,19 +313,25 @@ class MovingModule:
         self.p_y = 0
         self.priv_t = pygame.time.get_ticks()
     def move_left(self):
-        self.v_x = -0.00001
+        self.v_x = -0.001
     def move_right(self):
-        self.v_x = 0.00001
+        self.v_x = 0.001
     def move_up(self):
-        self.v_y = -0.00001
+        self.v_y = -0.001
     def move_down(self):
-        self.v_y = 0.00001
+        self.v_y = 0.001
     def move_stop(self):
         self.v_x = 0
         self.v_y = 0 
     def update(self, x, y, sprite, walls):
-        dt = pygame.time.get_ticks() - self.priv_t
-        priv_t = pygame.time.get_ticks()    
+        current = pygame.time.get_ticks() 
+        dt = current - self.priv_t
+        print(dt) # problem dt increase 
+
+        if (dt < 100):
+            return x, y
+
+        priv_t = current
         collided_object = pygame.sprite.spritecollideany(sprite, walls)
         # added recursion for checking all collided object 
 
@@ -332,7 +339,6 @@ class MovingModule:
             obj = collided_object
             dx = int(x)-obj.rect.x
             dy = int(y)-obj.rect.y
-
  
             print("colide {} {}".format(dx, dy))
             sheeft_x = math.copysign((16 - math.fabs(dx)), dx)
