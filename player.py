@@ -313,13 +313,13 @@ class MovingModule:
         self.p_y = 0
         self.priv_t = pygame.time.get_ticks()
     def move_left(self):
-        self.v_x = -0.01
+        self.v_x = -0.1
     def move_right(self):
-        self.v_x = 0.01
+        self.v_x = 0.1
     def move_up(self):
-        self.v_y = -0.01
+        self.v_y = -0.1
     def move_down(self):
-        self.v_y = 0.01
+        self.v_y = 0.1
     def move_stop(self):
         self.v_x = 0
         self.v_y = 0 
