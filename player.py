@@ -313,13 +313,13 @@ class MovingModule:
         self.p_y = 0
         self.priv_t = pygame.time.get_ticks()
     def move_left(self):
-        self.v_x = -0.001
+        self.v_x = -0.01
     def move_right(self):
-        self.v_x = 0.001
+        self.v_x = 0.01
     def move_up(self):
-        self.v_y = -0.001
+        self.v_y = -0.01
     def move_down(self):
-        self.v_y = 0.001
+        self.v_y = 0.01
     def move_stop(self):
         self.v_x = 0
         self.v_y = 0 
@@ -331,7 +331,7 @@ class MovingModule:
         if (dt < 100):
             return x, y
 
-        priv_t = current
+        self.priv_t = current
         collided_object = pygame.sprite.spritecollideany(sprite, walls)
         # added recursion for checking all collided object 
 
