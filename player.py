@@ -326,7 +326,7 @@ class MovingModule:
     def update(self, x, y, sprite, walls):
         current = pygame.time.get_ticks() 
         dt = current - self.priv_t
-        print(dt) # problem dt increase 
+        #print(dt) # problem dt increase 
 
         if (dt < 100):
             return x, y
@@ -340,7 +340,7 @@ class MovingModule:
             dx = int(x)-obj.rect.x
             dy = int(y)-obj.rect.y
  
-            print("colide {} {}".format(dx, dy))
+            # print("colide {} {}".format(dx, dy))
             sheeft_x = math.copysign((16 - math.fabs(dx)), dx)
             sheeft_y = math.copysign((16 - math.fabs(dy)), dy)
             if (self.v_x != 0):

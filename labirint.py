@@ -171,19 +171,8 @@ def main ():
     menu_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((Game.screen_setting["size"][0]-100, 10), (100, 50)),
                                              text='Menu',
                                              manager=manager)
-    htm_text_block_2 = pygame_gui.elements.UITextBox('<font face=fira_code size=2 color=#000000><b>Hey, What the heck!</b>'
-                             '<br><br>'
-                             'This is some <a href="test">text</a> in a different box,'
-                             ' hooray for variety - '
-                             'if you want then you should put a ring upon it. '
-                             '<body bgcolor=#990000>What if we do a really long word?</body> '
-                             '<b><i>derp FALALALALALALALXALALALXALALALALAAPaaaaarp gosh'
-                             '</b></i></font>',
-                             pygame.Rect((520, 10), (250, 200)),
-                             manager=manager,
-                             object_id="#text_box_2")
-    men= menu.MenuWindow(pygame.Rect((0, 0), (100, 100)),
-                             manager)
+
+    menu_window = None
     camera = Camera(Game.screen_setting["size"], Game.locationSizeX, Game.locationSizeY)
     player = Player(Game.current_mobs)
     # list of mobs contaned all living mobs in game 
@@ -232,8 +221,19 @@ def main ():
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == menu_button:
-                        print('Hello World!')
-                        htm_text_block_2.visible = not (htm_text_block_2.visible)
+                        if menu_window is None:
+                            menu_window = menu.MenuWindow(pygame.Rect((0, 0), (100, 100)),
+                             manager)
+                            menu_window.show()
+                            print("create")
+                        else:
+                            menu_window.kill()
+                            menu_window = None
+                if event.user_type == pygame_gui.UI_WINDOW_CLOSE:
+                        if event.ui_element == menu_window:
+                            menu_window.kill()
+                            menu_window = None
+                            print("Window closed")
             manager.process_events(event)
 
         manager.update(time_delta)
