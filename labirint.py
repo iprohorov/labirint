@@ -222,7 +222,7 @@ def main ():
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == menu_button:
                         if menu_window is None:
-                            menu_window = menu.MenuWindow(pygame.Rect((0, 0), (100, 100)),
+                            menu_window = menu.MenuWindow(pygame.Rect((0, 0), (400, 400)),
                              manager)
                             menu_window.show()
                             print("create")
