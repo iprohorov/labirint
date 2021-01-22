@@ -5,6 +5,8 @@ import TimeObjects
 import pytmx
 from player import Player
 from player import Mob
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
 import pygame_gui
 import menu
 
@@ -15,7 +17,7 @@ class Wall (pygame.sprite.Sprite):
     def __init__ (self, X=0, Y=0, image = None):
         pygame.sprite.Sprite.__init__(self)
         if (image is None):
-            self.image = pygame.image.load("wall.png").convert_alpha()
+            self.image = pygame.image.load("res\\wall.png").convert_alpha()
         else:
             self.image = image
         self.rect = self.image.get_rect(center=(X,Y))
@@ -137,9 +139,9 @@ class Game:
         Game.game_map, Game.locationSizeX, Game.locationSizeY = location.drawUseTMX(Game.location_pieces)
         print(f"MAP:{Game.locationSizeX},{Game.locationSizeY}")
     def load_location_piece(self):
-        location_pieces = {0:pytmx.load_pygame('image\\Tilemap\\t0.tmx'), 
-                           1:pytmx.load_pygame('image\\Tilemap\\t1.tmx'),
-                           2:pytmx.load_pygame('image\\Tilemap\\t2.tmx')}
+        location_pieces = {0:pytmx.load_pygame('res\\t0.tmx'), 
+                           1:pytmx.load_pygame('res\\t1.tmx'),
+                           2:pytmx.load_pygame('res\\t2.tmx')}
         return location_pieces
 
 def DrawMAP (camera):
@@ -167,7 +169,7 @@ def main ():
     pygame.init()
     screen = pygame.display.set_mode(Game.screen_setting["size"])
     game = Game()
-    manager = pygame_gui.UIManager(Game.screen_setting["size"])
+    manager = pygame_gui.UIManager(Game.screen_setting["size"], "res\\theme.json")
     menu_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((Game.screen_setting["size"][0]-100, 10), (100, 50)),
                                              text='Menu',
                                              manager=manager)
@@ -181,10 +183,10 @@ def main ():
     for mob in all_mobs_list:
         Game.current_mobs.add(mob)
 
-    light=pygame.image.load('light.png')
+    light=pygame.image.load('res\\light.png')
 
     pygame.font.init()
-    myfont = pygame.font.SysFont('Aria', 24)
+    myfont = pygame.font.Font('res\\font.ttf', 24)
 
 
     isNeeedUpdateLocation = True

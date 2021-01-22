@@ -45,12 +45,12 @@ class Animation:
 class Player (pygame.sprite.Sprite):
     def __init__ (self, current_Mobs, X=40, Y=48, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
-        self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
-        self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
-        self.rightGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100)
-        self.leftGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100, True)
-        self.leftAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100, True, shot_animation = True)
-        self.rightAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100, shot_animation = True)
+        self.upGoAnimation = Animation(["res\\hero1z.png","res\\hero2z.png","res\\hero3z.png","res\\hero4z.png"],100)
+        self.downGoAnimation = Animation(["res\\herou1.png","res\\herou2.png","res\\herou3.png","res\\herou4.png"],100)
+        self.rightGoAnimation = Animation(["res\\herol1.png","res\\herol2.png","res\\herol3.png","res\\herol4.png"],100)
+        self.leftGoAnimation = Animation(["res\\herol1.png","res\\herol2.png","res\\herol3.png","res\\herol4.png"],100, True)
+        self.leftAtackAnimation = Animation(["res\\PatackL.png","res\\PAL2.png","res\\PAL3.png","res\\PAL4.png"],100, True, shot_animation = True)
+        self.rightAtackAnimation = Animation(["res\\PatackL.png","res\\PAL2.png","res\\PAL3.png","res\\PAL4.png"],100, shot_animation = True)
 
         self.currentAnimation = self.downGoAnimation
         self.image = self.currentAnimation.getImg()
@@ -143,12 +143,12 @@ class Mob (pygame.sprite.Sprite):
     def __init__ (self, x_start_global, y_start_global, Walls, current_Mobs, time_object, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
         self.time_object = time_object
-        self.upGoAnimation = Animation(["hero1z.png","hero2z.png","hero3z.png","hero4z.png"],100)
-        self.downGoAnimation = Animation(["herou1.png","herou2.png","herou3.png","herou4.png"],100)
-        self.rightGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100)
-        self.leftGoAnimation = Animation(["herol1.png","herol2.png","herol3.png","herol4.png"],100, True)
-        self.leftAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100, True)
-        self.rightAtackAnimation = Animation(["PatackL.png","PAL2.png","PAL3.png","PAL4.png"],100)
+        self.upGoAnimation = Animation(["res\\hero1z.png","res\\hero2z.png","res\\hero3z.png","res\\hero4z.png"],100)
+        self.downGoAnimation = Animation(["res\\herou1.png","res\\herou2.png","res\\herou3.png","res\\herou4.png"],100)
+        self.rightGoAnimation = Animation(["res\\herol1.png","res\\herol2.png","res\\herol3.png","res\\herol4.png"],100)
+        self.leftGoAnimation = Animation(["res\\herol1.png","res\\herol2.png","res\\herol3.png","res\\herol4.png"],100, True)
+        self.leftAtackAnimation = Animation(["res\\PatackL.png","res\\PAL2.png","res\\PAL3.png","res\\PAL4.png"],100, True)
+        self.rightAtackAnimation = Animation(["res\\PatackL.png","res\\PAL2.png","res\\PAL3.png","res\\PAL4.png"],100)
         self.currentAnimation = self.downGoAnimation
         self.image = self.currentAnimation.getImg()
         self.rect = self.image.get_rect(center=(0,0))

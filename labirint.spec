@@ -3,14 +3,14 @@
 block_cipher = None
 
 
-a = Analysis(['labirint.py'],
+a = Analysis(['D:/PythonProject/fun/labirint/labirint.py'],
              pathex=['D:\\PythonProject\\fun\\labirint'],
              binaries=[],
-             datas=[],
+             datas=[('D:/PythonProject/fun/labirint/res', 'res/')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['pygame_gui'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,
