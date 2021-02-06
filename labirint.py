@@ -208,7 +208,8 @@ def main ():
     while 1:
         time_delta = clock.tick(60)/1000.0
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: 
+            if event.type == pygame.QUIT:
+                import sys
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -238,6 +239,7 @@ def main ():
                         if menu_window is None:
                             menu_window = menu.MenuWindow(pygame.Rect((0, 0), (400, 400)),manager)
                             menu_window.show()
+                            player.pause()
                             print("create")
                         else:
                             menu_window.kill()
@@ -254,9 +256,14 @@ def main ():
 
         manager.update(time_delta)
         isNeeedUpdateLocation = camera.update(player) 
+
         if isNeeedUpdateLocation or FirstRUN:
             FirstRUN = False
             DrawMAP(camera)
+        
+        if menu_window is None:
+            # run game after pause
+            player.play()
         
         screen.fill(Game.screen_setting["backcolor"])
         

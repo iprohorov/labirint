@@ -64,7 +64,7 @@ class Player (pygame.sprite.Sprite):
         self.global_position_y = cameraPositionY+ int(self.y)
         self.current_Mobs = current_Mobs
         self.mov_module = MovingModule()
-        self.__is_pause = False
+        self.is_game_pause = False
 
     def StopMoving(self):
         self.currentAnimation.Stop()
@@ -78,13 +78,16 @@ class Player (pygame.sprite.Sprite):
         self.rect.topleft = (int(self.x), int(self.y))
 
     def pause (self):
-        self.__is_pause = True
+        self.is_game_pause = True
+        self.mov_module.pause()
+    
+    def play (self):
+        self.is_game_pause = False
+        self.mov_module.run()
 
     def LeftAtack(self):
-        self.currentAnimation = self.leftAtackAnimation
-        self.currentAnimation.Start()
-
-    def LeftAtack(self):
+        if self.is_game_pause:
+            return
         self.currentAnimation = self.leftAtackAnimation
         self.currentAnimation.Start()
         ans = pygame.sprite.spritecollideany(self,self.current_Mobs) 
@@ -93,6 +96,8 @@ class Player (pygame.sprite.Sprite):
             ans.GetDamage("Left")
 
     def RightAtack(self):
+        if self.is_game_pause:
+            return
         self.currentAnimation = self.rightAtackAnimation
         self.currentAnimation.Start()
         ans = pygame.sprite.spritecollideany(self,self.current_Mobs) 
@@ -118,22 +123,32 @@ class Player (pygame.sprite.Sprite):
                 self.y_speed = speed
 
     def MoveLeft (self):
+        if self.is_game_pause:
+            return
         self._SetUpMoving(self.leftGoAnimation, -0.1, "x")
         self.mov_module.move_left()
 
     def MoveRight (self):
+        if self.is_game_pause:
+            return
         self._SetUpMoving(self.rightGoAnimation, 0.1, "x")
         self.mov_module.move_right()
 
     def MoveUp (self):
+        if self.is_game_pause:
+            return
         self._SetUpMoving(self.upGoAnimation, -0.1, "y")
         self.mov_module.move_up()  
 
     def MoveDown (self):
+        if self.is_game_pause:
+            return
         self._SetUpMoving(self.downGoAnimation, 0.1, "y")
         self.mov_module.move_down()
 
     def GetDamage(self, direction):
+        if self.is_game_pause:
+            return
         import random 
         random.seed()
         shifting = random.randint(1, 16)
