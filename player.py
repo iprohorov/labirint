@@ -64,16 +64,21 @@ class Player (pygame.sprite.Sprite):
         self.global_position_y = cameraPositionY+ int(self.y)
         self.current_Mobs = current_Mobs
         self.mov_module = MovingModule()
+        self.__is_pause = False
 
     def StopMoving(self):
         self.currentAnimation.Stop()
         self.mov_module.move_stop()
+
     def update(self, Walls, cameraPositionX, cameraPositionY):
         self.global_position_x = cameraPositionX+ int(self.x)
         self.global_position_y = cameraPositionY+ int(self.y)
         self.x, self.y = self.mov_module.update(self.x, self.y, self, Walls)
         self.image = self.currentAnimation.getImg()
         self.rect.topleft = (int(self.x), int(self.y))
+
+    def pause (self):
+        self.__is_pause = True
 
     def LeftAtack(self):
         self.currentAnimation = self.leftAtackAnimation
@@ -312,6 +317,7 @@ class MovingModule:
         self.p_x = 0
         self.p_y = 0
         self.priv_t = pygame.time.get_ticks()
+        self.__is_pause = False
     def move_left(self):
         self.v_x = -0.1
     def move_right(self):
@@ -323,15 +329,25 @@ class MovingModule:
     def move_stop(self):
         self.v_x = 0
         self.v_y = 0 
+    def pause(self):
+        self.__is_pause = True
+    def run(self):
+        self.__is_pause = False
+    
+
     def update(self, x, y, sprite, walls):
         current = pygame.time.get_ticks() 
         dt = current - self.priv_t
         #print(dt) # problem dt increase 
 
-        if (dt < 100):
+        if (dt < 10):
             return x, y
 
         self.priv_t = current
+
+        if self.__is_pause:
+            return x, y
+
         collided_object = pygame.sprite.spritecollideany(sprite, walls)
         # added recursion for checking all collided object 
 

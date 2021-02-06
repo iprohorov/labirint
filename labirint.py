@@ -124,6 +124,7 @@ class Game:
     locationSizeX = None
     locationSizeY = None
     location_pieces = None
+    is_game_pause = False
     def __init__ (self):
         #group consist static solid object
         Game.walls = pygame.sprite.Group()
@@ -132,13 +133,18 @@ class Game:
         #group for showing time object 
         Game.time_object = pygame.sprite.Group()
         #generate map
-        location = labirint_gen.Labyrinth(50,50)
+        Game.generate_new_location (50, 50)
+        
+    def generate_new_location(size_x, size_y):
+        """Generate map in and labirint, size in rooms (16X16 sprites)"""
+        location = labirint_gen.Labyrinth(size_x, size_y)
         location.dbgPrint()
         #load tmx map for room
-        Game.location_pieces = self.load_location_piece()
+        Game.location_pieces = Game.load_location_piece()
         Game.game_map, Game.locationSizeX, Game.locationSizeY = location.drawUseTMX(Game.location_pieces)
         print(f"MAP:{Game.locationSizeX},{Game.locationSizeY}")
-    def load_location_piece(self):
+
+    def load_location_piece():
         location_pieces = {0:pytmx.load_pygame('res\\t0.tmx'), 
                            1:pytmx.load_pygame('res\\t1.tmx'),
                            2:pytmx.load_pygame('res\\t2.tmx')}
@@ -164,6 +170,12 @@ def DrawMAP (camera):
             if (not(Game.game_map[y][x] is None)):
                  Game.walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = Game.location_pieces[Game.game_map[y][x][0]].get_tile_image_by_gid(Game.game_map[y][x][1])))
     return True
+
+def Reload__menu_button_action (camera):
+    # location reload once when player go out. camera need fo force reload
+    Game.generate_new_location (50, 50)
+    DrawMAP(camera)
+
 
 def main ():
     pygame.init()
@@ -224,13 +236,15 @@ def main ():
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == menu_button:
                         if menu_window is None:
-                            menu_window = menu.MenuWindow(pygame.Rect((0, 0), (400, 400)),
-                             manager)
+                            menu_window = menu.MenuWindow(pygame.Rect((0, 0), (400, 400)),manager)
                             menu_window.show()
                             print("create")
                         else:
                             menu_window.kill()
                             menu_window = None
+                    if (menu_window is not None) and (event.ui_element == menu_window.menu_button_reload):
+                        print ("Reload")
+                        Reload__menu_button_action(camera)
                 if event.user_type == pygame_gui.UI_WINDOW_CLOSE:
                         if event.ui_element == menu_window:
                             menu_window.kill()
