@@ -178,6 +178,7 @@ class Labyrinth ():
                 for t in layer.iter_data():
                     if (t[2] != 0):
                         self.wallMap[x*self.scaleX+t[0]][y*self.scaleY+t[1]] = (pieces, t[2])
+                        # return id element end location pieces
 
     def drawUseTMX(self, location_pieces):
         self.scaleX = 16

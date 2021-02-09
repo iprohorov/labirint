@@ -169,6 +169,9 @@ def DrawMAP (camera):
             #Wals is static object 
             if (not(Game.game_map[y][x] is None)):
                  Game.walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = Game.location_pieces[Game.game_map[y][x][0]].get_tile_image_by_gid(Game.game_map[y][x][1])))
+                 prop = Game.location_pieces[Game.game_map[y][x][0]].get_tile_properties_by_gid(Game.game_map[y][x][1])
+                 if (prop is not None):
+                     print(prop)
     return True
 
 def Reload__menu_button_action (camera):
