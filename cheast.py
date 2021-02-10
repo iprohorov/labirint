@@ -15,7 +15,7 @@ class Chest (pygame.sprite.Sprite):
     def do (self):
         shifting = random.randint(1, 16)
         self.time_object.add(TimeObjects.FromHeroText("Oh empty!", x = self.rect.x + shifting, y =self.rect.y - shifting, color = (128, 128, 128), life_time = 600))
-    def check_colide (self, player_rect):
+    def check_colide (self, player_rect, action):
         ans = self.rect.colliderect(player_rect)
-        if ans:
+        if ans and action:
             self.do()

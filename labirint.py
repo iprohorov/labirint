@@ -128,6 +128,7 @@ class Game:
     locationSizeY = None
     location_pieces = None
     is_game_pause = False
+    is_button_e_press = False
     def __init__ (self):
         #group consist cheat solid object 
         Game.chest = pygame.sprite.Group()
@@ -246,6 +247,8 @@ def main ():
                     player.LeftAtack()
                 if event.key == pygame.K_d:
                     player.RightAtack()
+                if event.key == pygame.K_e:
+                    Game.is_button_e_press = True
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == menu_button:
@@ -286,7 +289,9 @@ def main ():
             mob.update(Game.walls, player, camera.cameraPositionX, camera.cameraPositionY, Game.screen_setting["size"])
         
         for chest in Game.chest.sprites():
-            chest.check_colide(player.contact_rect)
+            chest.check_colide(player.contact_rect, Game.is_button_e_press)
+
+        Game.is_button_e_press = False
             
         Game.walls.draw(screen)
         Game.time_object.draw(screen)

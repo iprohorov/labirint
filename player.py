@@ -195,7 +195,7 @@ class Mob (pygame.sprite.Sprite):
         import random 
         random.seed()
         shifting = random.randint(1, 16)
-        self.time_object.add(TimeObjects.FromHeroText("-1", x = self.rect.x + shifting, y =self.rect.y - shifting))
+        self.time_object.add(TimeObjects.FromHeroText("-1", x = self.rect.x + shifting, y =self.rect.y - shifting, color = (0, 0, 255)))
         if len (pygame.sprite.spritecollide(self,self.Walls,False)) == 0:
             if direction == "Left":
                 self.global_position_x = self.global_position_x - 5
@@ -293,7 +293,7 @@ class Mob (pygame.sprite.Sprite):
     def LeftAtack(self):
         self.currentAnimation = self.leftAtackAnimation
         self.currentAnimation.Start()
-        ans = pygame.sprite.spritecollideany(self.player,self.current_Mobs) 
+        ans = pygame.sprite.spritecollide(self,self.player) 
         #print(ans)
         if not (ans is None):
             print("damage")
@@ -302,7 +302,8 @@ class Mob (pygame.sprite.Sprite):
     def RightAtack(self):
         self.currentAnimation = self.rightAtackAnimation
         self.currentAnimation.Start()
-        ans = pygame.sprite.spritecollideany(self.player,self.current_Mobs) 
+        #change option for mob 
+        ans = pygame.sprite.spritecollideany(self,self.player) 
         #print(ans)
         if not (ans is None):
             print("damage")
