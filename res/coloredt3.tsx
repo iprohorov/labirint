@@ -6,5 +6,10 @@
    <property name="type" value="tree"/>
   </properties>
  </tile>
+ <tile id="200">
+  <properties>
+   <property name="type" value="chest"/>
+  </properties>
+ </tile>
  <tile id="554" type="u"/>
 </tileset>

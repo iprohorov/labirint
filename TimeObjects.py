@@ -11,6 +11,14 @@ class FromHeroText (pygame.sprite.Sprite):
         myfont = pygame.font.SysFont('Aria', 24)
         self.image = myfont.render(text, False, color)
         self.rect = self.image.get_rect(center=(x,y))
+        self.alfa = 255
+        self.alfa_time = self.createTime
+        self.alfa_dt = 240//(life_time//10)
     def update(self):
+        
+        if (self.alfa_time+self.life_time/10) < pygame.time.get_ticks():
+             self.alfa = self.alfa - self.alfa_dt
+
+        self.image.set_alpha(self.alfa)
         if self.createTime + self.life_time < pygame.time.get_ticks():
             self.kill()

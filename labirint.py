@@ -24,7 +24,7 @@ class Wall (pygame.sprite.Sprite):
     def clear_callback(surf, rect):
         color = 0, 0, 0
         surf.fill(color, rect)
-
+        
 class Camera :
     def __init__(self, size, xSize, ySize):
         self.size = size
