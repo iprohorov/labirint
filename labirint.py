@@ -1,4 +1,6 @@
 
+from pygame.constants import GL_MULTISAMPLEBUFFERS
+from cheast import Chest
 import pygame
 import labirint_gen
 import TimeObjects
@@ -24,7 +26,7 @@ class Wall (pygame.sprite.Sprite):
     def clear_callback(surf, rect):
         color = 0, 0, 0
         surf.fill(color, rect)
-        
+
 class Camera :
     def __init__(self, size, xSize, ySize):
         self.size = size
@@ -117,6 +119,7 @@ class Camera :
 class Game:
     screen_setting = {"size":(1366, 768), "backcolor": (71, 45, 60), "light":False}
     status = {""}
+    chest = None
     walls = None
     current_mobs = None 
     time_object = None
@@ -126,6 +129,8 @@ class Game:
     location_pieces = None
     is_game_pause = False
     def __init__ (self):
+        #group consist cheat solid object 
+        Game.chest = pygame.sprite.Group()
         #group consist static solid object
         Game.walls = pygame.sprite.Group()
         #display mobs using for colide detected 
@@ -168,10 +173,15 @@ def DrawMAP (camera):
         for y in range (camera.cameraPositionY,fullScreenSizeY):
             #Wals is static object 
             if (not(Game.game_map[y][x] is None)):
-                 Game.walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = Game.location_pieces[Game.game_map[y][x][0]].get_tile_image_by_gid(Game.game_map[y][x][1])))
-                 prop = Game.location_pieces[Game.game_map[y][x][0]].get_tile_properties_by_gid(Game.game_map[y][x][1])
-                 if (prop is not None):
-                     print(prop)
+                prop = Game.location_pieces[Game.game_map[y][x][0]].get_tile_properties_by_gid(Game.game_map[y][x][1])
+                if (prop is not None):
+                    #Added checking type
+                    tmp_object = Chest((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16, Game.location_pieces[Game.game_map[y][x][0]].get_tile_image_by_gid(Game.game_map[y][x][1]), Game.time_object)
+                    Game.walls.add(tmp_object)
+                    Game.chest.add(tmp_object)
+                else:
+                    Game.walls.add(Wall((x-camera.cameraPositionX)*16,(y-camera.cameraPositionY)*16,image = Game.location_pieces[Game.game_map[y][x][0]].get_tile_image_by_gid(Game.game_map[y][x][1])))
+
     return True
 
 def Reload__menu_button_action (camera):
@@ -275,7 +285,9 @@ def main ():
         for mob in all_mobs_list:
             mob.update(Game.walls, player, camera.cameraPositionX, camera.cameraPositionY, Game.screen_setting["size"])
         
-        
+        for chest in Game.chest.sprites():
+            chest.check_colide(player.contact_rect)
+            
         Game.walls.draw(screen)
         Game.time_object.draw(screen)
         Game.time_object.update()

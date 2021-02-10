@@ -65,6 +65,7 @@ class Player (pygame.sprite.Sprite):
         self.current_Mobs = current_Mobs
         self.mov_module = MovingModule()
         self.is_game_pause = False
+        self.contact_rect = pygame.Rect((self.x+8, self.y+8), (12, 12))
 
     def StopMoving(self):
         self.currentAnimation.Stop()
@@ -76,7 +77,7 @@ class Player (pygame.sprite.Sprite):
         self.x, self.y = self.mov_module.update(self.x, self.y, self, Walls)
         self.image = self.currentAnimation.getImg()
         self.rect.topleft = (int(self.x), int(self.y))
-
+        self.contact_rect.topleft = (int(self.x+8), int(self.y+8))
     def pause (self):
         self.is_game_pause = True
         self.mov_module.pause()
