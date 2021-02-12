@@ -43,7 +43,7 @@ class Animation:
     # add animation complete add time of animation 
         
 class Player (pygame.sprite.Sprite):
-    def __init__ (self, current_Mobs, X=40, Y=48, cameraPositionX = 0, cameraPositionY = 0):
+    def __init__ (self, current_Mobs, time_object, walls, X=40, Y=48, cameraPositionX = 0, cameraPositionY = 0):
         pygame.sprite.Sprite.__init__(self)
         self.upGoAnimation = Animation(["res\\hero1z.png","res\\hero2z.png","res\\hero3z.png","res\\hero4z.png"],100)
         self.downGoAnimation = Animation(["res\\herou1.png","res\\herou2.png","res\\herou3.png","res\\herou4.png"],100)
@@ -64,6 +64,10 @@ class Player (pygame.sprite.Sprite):
         self.global_position_y = cameraPositionY+ int(self.y)
         self.current_Mobs = current_Mobs
         self.mov_module = MovingModule()
+
+        self.Walls = walls
+
+        self.time_object = time_object
         self.is_game_pause = False
         self.contact_rect = pygame.Rect((self.x+8, self.y+8), (12, 12))
 
@@ -293,11 +297,11 @@ class Mob (pygame.sprite.Sprite):
     def LeftAtack(self):
         self.currentAnimation = self.leftAtackAnimation
         self.currentAnimation.Start()
-        ans = pygame.sprite.spritecollide(self,self.player) 
+        ans = pygame.sprite.collide_circle(self, self.player) 
         #print(ans)
-        if not (ans is None):
+        if ans :
             print("damage")
-            ans.GetDamage("Left")
+            self.player.GetDamage("Left")
 
     def RightAtack(self):
         self.currentAnimation = self.rightAtackAnimation
