@@ -189,22 +189,32 @@ class Mob (pygame.sprite.Sprite):
         self.global_position_x = x_start_global
         self.global_position_y = y_start_global
         self.mov_module = MovingModule()
+        self.hp = 10
+        self.is_dead = False
 
     def StopMoving(self):
         self.currentAnimation.Stop()
         self.x_speed = 0
         self.y_speed = 0
-        self.mov_module.move_stop()                                                             
-    def GetDamage(self, direction):
+        self.mov_module.move_stop()
+
+    def Dead_check (self):
+        if self.hp < 0:
+            self.is_dead = True
+            self.isVisable = False
+
+    def GetDamage(self, direction, damage = 1):
+        self.hp -= damage
         import random 
         random.seed()
         shifting = random.randint(1, 16)
-        self.time_object.add(TimeObjects.FromHeroText("-1", x = self.rect.x + shifting, y =self.rect.y - shifting, color = (0, 0, 255)))
+        self.time_object.add(TimeObjects.FromHeroText("-{}".format(damage), x = self.rect.x + shifting, y =self.rect.y - shifting, color = (0, 0, 255)))
         if len (pygame.sprite.spritecollide(self,self.Walls,False)) == 0:
             if direction == "Left":
                 self.global_position_x = self.global_position_x - 5
             elif direction == "Right":
                 self.global_position_x = self.global_position_x + 5
+        self.Dead_check()
 
     def update(self, Walls, player, cameraPositionX, cameraPositionY, size):
         width, height = size
@@ -306,8 +316,7 @@ class Mob (pygame.sprite.Sprite):
     def RightAtack(self):
         self.currentAnimation = self.rightAtackAnimation
         self.currentAnimation.Start()
-        #change option for mob 
-        ans = pygame.sprite.spritecollideany(self,self.player) 
+        ans = pygame.sprite.collide_circle(self,self.player) 
         #print(ans)
         if not (ans is None):
             print("damage")

@@ -159,6 +159,9 @@ class Game:
 def DrawMAP (camera):
     # clean map 
     Game.walls.empty()
+    # need clean all static object
+    Game.chest.empty()
+
     width, height = Game.screen_setting["size"]
 
 
@@ -288,6 +291,7 @@ def main ():
         for mob in all_mobs_list:
             mob.update(Game.walls, player, camera.cameraPositionX, camera.cameraPositionY, Game.screen_setting["size"])
         
+
         for chest in Game.chest.sprites():
             chest.check_colide(player.contact_rect, Game.is_button_e_press)
 
@@ -301,14 +305,20 @@ def main ():
         for mob in all_mobs_list:
             if mob.isVisable:
                 screen.blit(mob.image, mob.rect)
+            if mob.is_dead:
+                all_mobs_list.remove(mob)
         
         if Game.screen_setting["light"]:
             filter = pygame.surface.Surface((width+100, height+100))
             filter.fill(pygame.color.Color('Grey'))
             filter.blit(light, (int(player.x), int(player.y)))
             screen.blit(filter, (-42, -42), special_flags=pygame.BLEND_RGBA_SUB)
+        
+        if all_mobs_list != []:
+            textsurface = myfont.render("Cam {}, {} Mob: {},{} {}".format(camera.cameraPositionX, camera.cameraPositionY, int(all_mobs_list[0].global_position_x), int(all_mobs_list[0].global_position_y), len(Game.chest.sprites())), False, (255, 0, 0))
+        else:
+            textsurface = myfont.render("Cam {}, {}".format(camera.cameraPositionX, camera.cameraPositionY), False, (255, 0, 0))
 
-        textsurface = myfont.render("Cam {}, {} Mob: {},{} ".format(camera.cameraPositionX, camera.cameraPositionY, int(all_mobs_list[0].global_position_x), int(all_mobs_list[0].global_position_y)), False, (255, 0, 0))
         screen.blit(textsurface,(0,0))
         manager.draw_ui(screen)
         pygame.display.flip()
